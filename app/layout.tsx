@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
-import { DM_Sans, Fraunces } from "next/font/google";
+import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
 
-const sans = DM_Sans({
+const sans = Outfit({
   subsets: ["latin", "latin-ext"],
   variable: "--font-sans",
 });
 
-const display = Fraunces({
+const display = Syne({
   subsets: ["latin", "latin-ext"],
   variable: "--font-display",
 });
 
 export const metadata: Metadata = {
-  title: "Yeşil Vadi Parkı | Doğayla buluş",
+  title: "Meg Proje | Yakında",
   description:
-    "Şehrin kalbinde yeşil bir kaçış: yürüyüş yolları, oyun alanları ve huzurlu bir piknik köşesi.",
+    "Meg Proje — Mimarlık, iç mimarlık ve mühendislik. Kurumsal web sitemiz yakında.",
   openGraph: {
-    title: "Yeşil Vadi Parkı",
-    description: "Doğayla buluş, nefes al.",
+    title: "Meg Proje",
+    description: "Mimarlık · İç mimarlık · Mühendislik — Yakında.",
     type: "website",
   },
 };
