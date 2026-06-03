@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
-const MIN = 24;
-const MAX = 72;
+const MIN = 33;
+const MAX = 80;
 const DURATION_MS = 2800;
 
 export default function ProgressBlock() {

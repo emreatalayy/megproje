@@ -4,14 +4,22 @@ import styles from "./page.module.css";
 
 const CONTACT_EMAIL = "info@megproje.net";
 
+const SERVICES = [
+  "Mimarlık",
+  "İç mimarlık",
+  "Mühendislik",
+] as const;
+
 export default function ParkPage() {
   const year = new Date().getFullYear();
 
   return (
     <div className={styles.page}>
       <div className={styles.ambient} aria-hidden>
+        <span className={styles.grid} />
         <span className={styles.blob1} />
         <span className={styles.blob2} />
+        <span className={styles.blob3} />
         <span className={styles.ring} />
       </div>
 
@@ -27,6 +35,12 @@ export default function ParkPage() {
               priority
             />
           </div>
+
+          <ul className={styles.services} aria-label="Hizmet alanları">
+            {SERVICES.map((service) => (
+              <li key={service}>{service}</li>
+            ))}
+          </ul>
 
           <p className={styles.badge}>
             <span className={styles.badgeDot} aria-hidden />
@@ -48,7 +62,12 @@ export default function ParkPage() {
 
           <div className={styles.contactInline}>
             <span className={styles.contactLabel}>İletişim</span>
-            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+            <a
+              className={styles.contactLink}
+              href={`mailto:${CONTACT_EMAIL}`}
+            >
+              {CONTACT_EMAIL}
+            </a>
             <span className={styles.contactBrand}>Meg Proje</span>
           </div>
         </div>
