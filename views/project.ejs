@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <%- include('partials/head', { site: site, seo: seo }) %>
+  <link rel="stylesheet" href="/css/pages.css?v=11" />
+</head>
+<body>
+  <%- include('partials/nav') %>
+
+  <main>
+    <div class="page-wrap">
+      <a href="/#projects" class="back-link interactive">← Tüm projeler</a>
+
+      <header class="page-head" style="margin-bottom:0;">
+        <p class="page-head__eyebrow"><%= project.meta %></p>
+        <h1 class="page-head__title"><%= project.name %></h1>
+      </header>
+
+      <% if (project.image) { %>
+        <div class="project-hero__media">
+          <img src="<%= project.image %>" alt="<%= project.alt || project.name %>" />
+        </div>
+      <% } %>
+
+      <% if (project.description) { %>
+        <div class="project-desc"><%= project.description %></div>
+      <% } %>
+
+      <p style="margin-top:3rem;">
+        <a href="/#contact" class="section-link interactive">Benzer bir proje mi planlıyorsunuz? İletişime geçin →</a>
+      </p>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script>window.MEG_SITE = { contactEmail: "<%= site.contact.email %>" };</script>
+  <script src="/js/main.js?v=11"></script>
+</body>
+</html>

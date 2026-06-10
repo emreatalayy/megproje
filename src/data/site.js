@@ -1,15 +1,41 @@
 module.exports = {
   meta: {
-    title: "MEG Mimarlık | Konya",
+    title: "MEG Mimarlık | Konya Mimarlık ve İç Mimarlık Ofisi",
     description:
-      "MEG Mimarlık — Konya merkezli mimarlık, iç mekan ve kentsel tasarım stüdyosu.",
+      "MEG Mimarlık — 2012'den beri Konya'da konut, villa ve ticari projeler tasarlayan mimarlık & iç mimarlık ofisi. Mimari tasarım, iç mekan, restorasyon ve 3B görselleştirme.",
+    // SEO için kök adres. Vercel'de SITE_URL env'i ile ezilebilir.
+    siteUrl: process.env.SITE_URL || "https://www.megproje.net",
+    locale: "tr_TR",
+    ogImage:
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=630&fit=crop&q=80",
+    keywords:
+      "Konya mimarlık, Konya mimar, Konya mimarlık ofisi, Konya iç mimari, Konya iç mimarlık, villa projesi Konya, konut mimarisi Konya, restorasyon Konya, kentsel tasarım, mimari proje, Selçuklu mimar, Meram mimar, MEG Mimarlık",
+    organization: {
+      name: "MEG Mimarlık",
+      legalName: "MEG Mimarlık",
+      foundingDate: "2012",
+      priceRange: "₺₺",
+      // Yaklaşık konum (Sakarya Mah, Selçuklu/Konya). Google Business Profile'daki
+      // gerçek pinle güncellenmeli.
+      geo: { lat: 37.8997, lng: 32.4936 },
+      areaServed: ["Konya", "Selçuklu", "Meram", "Karatay"],
+      services: [
+        "Mimari Tasarım",
+        "İç Mimari",
+        "Kentsel Tasarım",
+        "Restorasyon",
+        "3B Görselleştirme",
+        "Proje Yönetimi",
+      ],
+    },
   },
 
   nav: [
-    { label: "Projeler", href: "#projects" },
-    { label: "Hizmetler", href: "#services" },
-    { label: "Hakkımızda", href: "#about" },
-    { label: "İletişim", href: "#contact" },
+    { label: "Projeler", href: "/#projects" },
+    { label: "Hizmetler", href: "/#services" },
+    { label: "Hakkımızda", href: "/#about" },
+    { label: "Blog", href: "/blog" },
+    { label: "İletişim", href: "/#contact" },
   ],
 
   hero: {
@@ -17,7 +43,7 @@ module.exports = {
     titleLines: ["Mekânı", "düşünceyle", "inşa ediyoruz"],
     titleItalicIndex: 1,
     subtitle:
-      "Karadeniz'in coğrafyasından ilham alan, sürdürülebilir ve insan odaklı mimari çözümler üretiyoruz.",
+      "Konya ve İç Anadolu'nun dokusundan ilham alan, sürdürülebilir ve insan odaklı mimari çözümler üretiyoruz.",
     decoChar: "M",
   },
 
@@ -145,7 +171,7 @@ module.exports = {
 
   contact: {
     title: "Birlikte tasarlayalım",
-    email: "info@megmimarlik.net",
+    email: "info@megproje.net",
     phone: "0543 884 07 41",
     phoneHref: "+905438840741",
     address: {

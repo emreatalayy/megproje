@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title><%= project ? 'Proje Düzenle' : 'Yeni Proje' %> | MEG Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/admin.css?v=1" />
+</head>
+<body class="admin">
+  <header class="admin-top">
+    <div class="admin-top__brand">MEG<small>Proje</small></div>
+    <div class="admin-top__nav">
+      <a href="/admin" class="btn btn--ghost btn--sm">← Panele Dön</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <h1 class="section-block__title" style="margin-bottom:1.5rem;"><%= project ? 'Proje Düzenle' : 'Yeni Proje' %></h1>
+
+    <% if (error) { %><div class="alert alert--error"><%= error %></div><% } %>
+
+    <form class="form" method="POST" action="<%= action %>" enctype="multipart/form-data">
+      <div class="field">
+        <label for="name">Proje Adı *</label>
+        <input type="text" id="name" name="name" required value="<%= project ? project.name : '' %>" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="meta">Etiket / Kategori</label>
+          <input type="text" id="meta" name="meta" placeholder="Konut · Konya" value="<%= project ? project.meta : '' %>" />
+        </div>
+        <div class="field">
+          <label for="slug">URL Kısaltması (slug)</label>
+          <input type="text" id="slug" name="slug" placeholder="otomatik" value="<%= project && project.slug ? project.slug : '' %>" />
+          <p class="field__hint">Boş bırakılırsa addan üretilir.</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="description">Açıklama</label>
+        <textarea id="description" name="description" placeholder="Proje hakkında detaylı açıklama..."><%= project ? project.description : '' %></textarea>
+      </div>
+
+      <div class="field">
+        <label for="image">Görsel</label>
+        <div class="file-drop">
+          <% if (project && project.image) { %><img src="<%= project.image %>" alt="" /><% } %>
+          <div style="flex:1;">
+            <input type="file" id="image" name="image" accept="image/*" <%= storageReady ? '' : 'disabled' %> />
+            <% if (!storageReady) { %>
+              <p class="field__hint">Storage tanımlı değil — aşağıya resim URL'si girin.</p>
+            <% } else if (project && project.image) { %>
+              <p class="field__hint">Yeni dosya seçmezseniz mevcut görsel korunur.</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="imageUrl">veya Görsel URL'si</label>
+        <input type="url" id="imageUrl" name="imageUrl" placeholder="https://..." value="<%= project && project.image ? project.image : '' %>" />
+        <p class="field__hint">Dosya yüklerseniz bu alan yok sayılır.</p>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="alt">Görsel Alt Metni (SEO)</label>
+          <input type="text" id="alt" name="alt" value="<%= project ? (project.alt || '') : '' %>" />
+        </div>
+        <div class="field">
+          <label for="order">Sıra</label>
+          <input type="number" id="order" name="order" value="<%= project ? (project.order || 0) : 0 %>" />
+        </div>
+      </div>
+
+      <div class="field check">
+        <input type="checkbox" id="published" name="published" <%= (!project || project.published) ? 'checked' : '' %> />
+        <label for="published">Yayında (sitede görünür)</label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn--primary">Kaydet</button>
+        <a href="/admin" class="btn btn--ghost">İptal</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // İki "image" alanından yalnızca biri gönderilsin: dosya seçilince URL'yi boşalt.
+    var fileInput = document.getElementById('image');
+    var urlInput = document.getElementById('imageUrl');
+    if (fileInput && urlInput) {
+      fileInput.addEventListener('change', function () {
+        if (fileInput.files && fileInput.files.length) urlInput.value = '';
+      });
+    }
+  </script>
+</body>
+</html>

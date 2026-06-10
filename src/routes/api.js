@@ -1,5 +1,6 @@
 const express = require("express");
-const siteData = require("../data/site");
+const projectsService = require("../services/projects");
+const mailer = require("../services/mailer");
 
 const router = express.Router();
 
@@ -7,11 +8,15 @@ router.get("/health", (req, res) => {
   res.json({ ok: true, service: "meg-mimarlik" });
 });
 
-router.get("/projects", (req, res) => {
-  res.json(siteData.projects.items);
+router.get("/projects", async (req, res, next) => {
+  try {
+    res.json(await projectsService.listPublished());
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.post("/contact", (req, res) => {
+router.post("/contact", async (req, res) => {
   const { name, email, message } = req.body || {};
 
   if (!name?.trim() || !email?.trim() || !message?.trim()) {
@@ -21,13 +26,28 @@ router.post("/contact", (req, res) => {
     });
   }
 
-  // İleride: Resend, Nodemailer, Supabase vb. buraya bağlanır
-  console.log("[contact]", { name, email, message });
+  // Basit e-posta format kontrolü
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return res.status(400).json({ ok: false, error: "Geçerli bir e-posta girin." });
+  }
 
-  res.json({
-    ok: true,
-    message: "Mesajınız alındı. En kısa sürede dönüş yapacağız.",
-  });
+  try {
+    await mailer.sendContact({
+      name: name.trim(),
+      email: email.trim(),
+      message: message.trim(),
+    });
+    res.json({
+      ok: true,
+      message: "Mesajınız alındı. En kısa sürede dönüş yapacağız.",
+    });
+  } catch (err) {
+    console.error("[contact] gönderim hatası:", err.message);
+    res.status(500).json({
+      ok: false,
+      error: "Mesaj gönderilemedi. Lütfen daha sonra tekrar deneyin.",
+    });
+  }
 });
 
 module.exports = router;
