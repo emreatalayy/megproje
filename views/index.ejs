@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="<%= site.meta.description %>" />
+  <title><%= site.meta.title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css?v=10" />
+</head>
+<body>
+  <%- include('partials/cursor') %>
+  <%- include('partials/nav') %>
+
+  <main>
+    <section class="hero page-section" id="hero" aria-label="Giriş" data-section="hero">
+      <div class="hero__deco" aria-hidden="true"><%= site.hero.decoChar %></div>
+      <div class="hero__geo" aria-hidden="true"></div>
+      <div class="hero__content">
+        <p class="hero__eyebrow eyebrow"><%= site.hero.eyebrow %></p>
+        <h1 class="hero__title">
+          <% site.hero.titleLines.forEach(function (line, i) { %>
+            <span>
+              <% if (i === site.hero.titleItalicIndex) { %>
+                <em><%= line %></em>
+              <% } else { %>
+                <%= line %>
+              <% } %>
+            </span>
+          <% }); %>
+        </h1>
+        <p class="hero__subtitle"><%= site.hero.subtitle %></p>
+      </div>
+      <div class="hero__scroll" aria-hidden="true">
+        <span class="hero__scroll-text">Aşağı Kaydır</span>
+        <span class="hero__scroll-line"></span>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <% for (let copy = 0; copy < 2; copy++) { %>
+          <div class="marquee__content"<%= copy === 1 ? ' aria-hidden="true"' : '' %>>
+            <% site.marquee.forEach(function (item, i) { %>
+              <span><%= item %></span><% if (i < site.marquee.length - 1) { %><span>·</span><% } %>
+            <% }); %><span>·</span>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <section class="section projects page-section" id="projects" aria-labelledby="projects-heading" data-section="projects">
+      <div class="section-header reveal">
+        <div class="section-header__left reveal reveal-delay-1">
+          <p class="section-label"><%= site.projects.label %></p>
+          <h2 class="section-title" id="projects-heading"><%= site.projects.title %></h2>
+        </div>
+        <a href="#contact" class="section-link reveal reveal-delay-2 interactive"><%= site.projects.cta %></a>
+      </div>
+
+      <p class="pacman-hint eyebrow reveal"><%= site.projects.scrollHint %></p>
+
+      <div class="pacman-scroll" id="pacmanScroll">
+        <div class="pacman-scroll__sticky">
+          <div class="pacman-view" id="pacmanView">
+            <div class="pacman-rail" id="pacmanRail">
+              <svg class="pacman-rail__svg" viewBox="0 0 640 960" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <defs>
+                  <mask id="pacmanEatMask" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="960">
+                    <path
+                      id="pacmanEatMaskPath"
+                      d="M 160 110
+                         L 436 110 Q 480 110 480 154
+                         L 480 246 Q 480 290 436 290
+                         L 204 290 Q 160 290 160 334
+                         L 160 426 Q 160 470 204 470
+                         L 436 470 Q 480 470 480 514
+                         L 480 606 Q 480 650 436 650
+                         L 204 650 Q 160 650 160 694
+                         L 160 786 Q 160 830 204 830
+                         L 470 830"
+                      pathLength="1"
+                      fill="none"
+                      stroke="#ffffff"
+                      stroke-width="48"
+                      stroke-linejoin="round"
+                      stroke-dasharray="1 1"
+                      stroke-dashoffset="0"
+                    />
+                  </mask>
+                </defs>
+                <path
+                  id="pacmanPath"
+                  d="M 160 110
+                     L 436 110 Q 480 110 480 154
+                     L 480 246 Q 480 290 436 290
+                     L 204 290 Q 160 290 160 334
+                     L 160 426 Q 160 470 204 470
+                     L 436 470 Q 480 470 480 514
+                     L 480 606 Q 480 650 436 650
+                     L 204 650 Q 160 650 160 694
+                     L 160 786 Q 160 830 204 830
+                     L 470 830"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="5"
+                  stroke-dasharray="0.1 24"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  mask="url(#pacmanEatMask)"
+                />
+              </svg>
+
+              <div class="pacman-player" id="pacmanPlayer" aria-hidden="true">
+                <span class="pacman-player__body"></span>
+              </div>
+
+              <div class="pacman-ghost" id="pacmanGhost" aria-hidden="true">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <path class="pacman-ghost__body" d="M8 92 V46 C8 24 26 8 50 8 C74 8 92 24 92 46 V92 L80 82 L68 92 L56 82 L44 92 L32 82 L20 92 Z" />
+                  <circle class="pacman-ghost__eye" cx="38" cy="44" r="9" />
+                  <circle class="pacman-ghost__eye" cx="64" cy="44" r="9" />
+                  <circle class="pacman-ghost__pupil" cx="41" cy="46" r="4" />
+                  <circle class="pacman-ghost__pupil" cx="67" cy="46" r="4" />
+                </svg>
+              </div>
+
+              <% site.projects.items.forEach(function (p, i) { %>
+                <div class="pacman-node pacman-node--<%= p.side %>" data-node="<%= i %>">
+                  <span class="pacman-node__pellet" aria-hidden="true"></span>
+                  <span class="pacman-node__link" aria-hidden="true"></span>
+                  <a href="#contact" class="pacman-node__seat interactive" title="<%= p.name %>">
+                    <span class="pacman-node__no"><%= p.id %></span>
+                    <span class="pacman-node__name"><%= p.name %></span>
+                  </a>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+          <div class="pacman-scroll__bar" aria-hidden="true">
+            <span class="pacman-scroll__fill" id="pacmanScrollFill"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section about page-section reveal" id="about" aria-labelledby="about-heading" data-section="about">
+      <div class="about-grid">
+        <blockquote class="about__statement reveal reveal-delay-1"><%- site.about.statement %></blockquote>
+        <div class="about__body reveal reveal-delay-2">
+          <% site.about.paragraphs.forEach(function (para) { %>
+            <p><%= para %></p>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+
+    <section class="section services page-section reveal" id="services" aria-labelledby="services-heading" data-section="services">
+      <div class="services-intro">
+        <div class="reveal reveal-delay-1">
+          <p class="section-label"><%= site.services.label %></p>
+          <h2 class="section-title" id="services-heading"><%= site.services.title %></h2>
+        </div>
+        <p class="reveal reveal-delay-2"><%= site.services.intro %></p>
+      </div>
+      <div class="services-grid">
+        <% site.services.items.forEach(function (svc, i) { %>
+          <article class="service-cell reveal reveal-delay-<%= (i % 3) + 1 %>">
+            <p class="service-cell__no"><%= svc.no %></p>
+            <h3 class="service-cell__name"><%= svc.name %></h3>
+            <p class="service-cell__desc"><%= svc.desc %></p>
+          </article>
+        <% }); %>
+      </div>
+    </section>
+
+    <section class="philosophy page-section reveal" aria-label="Felsefe" data-section="philosophy">
+      <span class="philosophy__quote-mark" aria-hidden="true">"</span>
+      <blockquote class="philosophy__text reveal reveal-delay-1"><%= site.philosophy.quote %></blockquote>
+      <p class="philosophy__attr reveal reveal-delay-2"><%= site.philosophy.attribution %></p>
+    </section>
+
+    <section class="section contact page-section reveal" id="contact" aria-labelledby="contact-heading" data-section="contact">
+      <div class="contact-grid">
+        <div>
+          <h2 class="contact__title reveal reveal-delay-1" id="contact-heading"><%= site.contact.title %></h2>
+          <div class="contact__item reveal reveal-delay-2">
+            <p class="contact__item-label">Adres</p>
+            <p class="contact__item-value"><%= site.contact.address.line1 %><br /><%= site.contact.address.line2 %></p>
+          </div>
+          <div class="contact__item reveal reveal-delay-3">
+            <p class="contact__item-label">E-posta</p>
+            <p class="contact__item-value"><a href="mailto:<%= site.contact.email %>" class="interactive"><%= site.contact.email %></a></p>
+          </div>
+          <div class="contact__item reveal reveal-delay-4">
+            <p class="contact__item-label">Telefon</p>
+            <p class="contact__item-value"><a href="tel:<%= site.contact.phoneHref %>" class="interactive"><%= site.contact.phone %></a></p>
+          </div>
+        </div>
+        <form class="contact__form reveal reveal-delay-2" id="contactForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="name">Ad Soyad</label>
+            <input class="form-input interactive" type="text" id="name" name="name" autocomplete="name" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">E-posta</label>
+            <input class="form-input interactive" type="email" id="email" name="email" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="message">Mesaj</label>
+            <textarea class="form-textarea interactive" id="message" name="message" rows="3" required></textarea>
+          </div>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite" hidden></p>
+          <button type="submit" class="form-submit interactive">Gönder</button>
+        </form>
+      </div>
+
+      <div class="contact-map reveal reveal-delay-2">
+        <div class="contact-map__header">
+          <p class="contact__item-label"><%= site.contact.map.label %></p>
+          <a href="<%= site.contact.map.directionsUrl %>" class="section-link interactive" target="_blank" rel="noopener noreferrer">Yol tarifi al →</a>
+        </div>
+        <div class="contact-map__frame">
+          <iframe
+            src="<%= site.contact.map.embedUrl %>"
+            title="MEG Mimarlık ofis konumu — <%= site.contact.address.full %>"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <a href="<%= site.contact.map.openUrl %>" class="contact-map__link interactive" target="_blank" rel="noopener noreferrer">Google Maps'te aç</a>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    window.MEG_SITE = { contactEmail: "<%= site.contact.email %>" };
+  </script>
+  <script src="/js/main.js?v=10"></script>
+</body>
+</html>

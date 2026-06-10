@@ -1,0 +1,9 @@
+<footer class="footer" role="contentinfo">
+  <span class="footer__logo">MEG</span>
+  <p class="footer__copy">© <%= site.footer.year %> MEG Mimarlık. Tüm hakları saklıdır.</p>
+  <div class="footer__social">
+    <% site.footer.social.forEach(function (s) { %>
+      <a href="<%= s.href %>" class="interactive" target="_blank" rel="noopener noreferrer"><%= s.label %></a>
+    <% }); %>
+  </div>
+</footer>
