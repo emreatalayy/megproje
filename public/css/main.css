@@ -1552,3 +1552,40 @@
       .nav-mobile__cta:hover,
       .form-submit:hover { transform: none; box-shadow: none; }
     }
+
+    /* WhatsApp yüzen buton */
+    .wa-fab {
+      position: fixed;
+      right: clamp(1rem, 3vw, 2rem);
+      bottom: clamp(1rem, 3vw, 2rem);
+      z-index: 200;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #25d366;
+      color: #fff;
+      box-shadow: 0 10px 28px -8px rgba(37, 211, 102, 0.65), 0 4px 12px rgba(0, 0, 0, 0.18);
+      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-out);
+      animation: waFabIn 0.5s var(--ease-spring) both;
+    }
+    .wa-fab:hover { transform: scale(1.08); box-shadow: 0 14px 34px -8px rgba(37, 211, 102, 0.8), 0 4px 12px rgba(0, 0, 0, 0.22); }
+    .wa-fab:active { transform: scale(0.96); }
+    .wa-fab__icon { width: 30px; height: 30px; fill: currentColor; }
+
+    @keyframes waFabIn {
+      from { opacity: 0; transform: scale(0.5) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .wa-fab { width: 52px; height: 52px; }
+      .wa-fab__icon { width: 28px; height: 28px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .wa-fab { animation: none; }
+      .wa-fab:hover { transform: none; }
+    }
