@@ -106,14 +106,18 @@
   /* Sekme / bölüm geçişleri */
   var navSectionIds = ["projects", "about", "services", "contact"];
   var navAnchors = document.querySelectorAll(
-    '.nav__links a[href^="#"], .nav-mobile__link[href^="#"]'
+    '.nav__links a[href*="#"], .nav-mobile__link[href*="#"]'
   );
   var pageSections = document.querySelectorAll(".page-section[id]");
 
+  function hashId(href) {
+    var parts = String(href || "").split("#");
+    return parts.length > 1 ? parts[1] : "";
+  }
+
   function setActiveNav(sectionId) {
     navAnchors.forEach(function (anchor) {
-      var href = anchor.getAttribute("href") || "";
-      var id = href.replace("#", "");
+      var id = hashId(anchor.getAttribute("href"));
       anchor.classList.toggle("is-active", id === sectionId);
     });
   }
@@ -150,12 +154,16 @@
     }, 900);
   }
 
-  document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+  document.querySelectorAll('a[href^="#"], a[href^="/#"]').forEach(function (link) {
     var href = link.getAttribute("href");
     if (!href || href === "#") return;
 
     link.addEventListener("click", function (e) {
-      var target = document.querySelector(href);
+      // "/#projects" gibi linkler başka sayfadayken normal gezinmeye bırakılır;
+      // hedef bu sayfada varsa (anasayfa) yumuşak kaydırma uygulanır.
+      var id = hashId(href);
+      if (!id) return;
+      var target = document.getElementById(id);
       if (!target) return;
 
       e.preventDefault();

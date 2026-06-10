@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin Giriş | MEG Mimarlık</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/admin.css?v=1" />
+</head>
+<body class="admin">
+  <div class="auth">
+    <form class="auth__card" method="POST" action="/admin/login">
+      <p class="auth__logo">MEG <span style="color:var(--a-accent)">·</span> Admin</p>
+      <p class="auth__sub">Yönetim paneline giriş yapın.</p>
+
+      <% if (error) { %><div class="alert alert--error"><%= error %></div><% } %>
+      <% if (!configured) { %>
+        <div class="alert alert--warn">
+          Admin hesabı henüz tanımlı değil. <code>.env</code> dosyasına
+          <code>ADMIN_USERNAME</code>, <code>ADMIN_PASSWORD</code> ve
+          <code>SESSION_SECRET</code> ekleyin.
+        </div>
+      <% } %>
+
+      <div class="field">
+        <label for="username">Kullanıcı Adı</label>
+        <input type="text" id="username" name="username" autocomplete="username" required autofocus />
+      </div>
+      <div class="field">
+        <label for="password">Şifre</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center;">Giriş Yap</button>
+    </form>
+  </div>
+</body>
+</html>

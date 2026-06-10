@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel | MEG Mimarlık Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/admin.css?v=1" />
+</head>
+<body class="admin">
+  <header class="admin-top">
+    <div class="admin-top__brand">MEG<small>Yönetim Paneli</small></div>
+    <div class="admin-top__nav">
+      <a href="/" target="_blank" class="btn btn--ghost btn--sm">Siteyi Gör ↗</a>
+      <form method="POST" action="/admin/logout" style="display:inline;">
+        <button type="submit" class="btn btn--ghost btn--sm">Çıkış</button>
+      </form>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <% if (!firebaseReady) { %>
+      <div class="alert alert--warn">
+        <strong>Firebase bağlı değil.</strong> Veriler kaydedilemez — şu an statik içerik gösteriliyor.
+        <code>.env</code> içine Firebase anahtarlarını ekleyince proje ve blog yönetimi aktifleşir.
+      </div>
+    <% } else if (!storageReady) { %>
+      <div class="alert alert--warn">
+        Firestore bağlı, ancak <strong>Storage</strong> tanımlı değil (<code>FIREBASE_STORAGE_BUCKET</code>).
+        Resim yüklemek yerine resim URL'si girebilirsiniz.
+      </div>
+    <% } %>
+
+    <% if (typeof ok !== 'undefined' && ok) {
+         var msgs = {
+           'project-created': 'Proje eklendi.',
+           'project-updated': 'Proje güncellendi.',
+           'project-deleted': 'Proje silindi.',
+           'post-created': 'Blog yazısı eklendi.',
+           'post-updated': 'Blog yazısı güncellendi.',
+           'post-deleted': 'Blog yazısı silindi.'
+         };
+    %>
+      <div class="alert alert--ok"><%= msgs[ok] || 'İşlem tamamlandı.' %></div>
+    <% } %>
+
+    <!-- Projeler -->
+    <section class="section-block">
+      <div class="section-block__head">
+        <div>
+          <h2 class="section-block__title">Projeler</h2>
+          <span class="section-block__count"><%= projects.length %> kayıt</span>
+        </div>
+        <a href="/admin/projects/new" class="btn btn--primary">+ Yeni Proje</a>
+      </div>
+
+      <% if (!projects.length) { %>
+        <div class="empty">Henüz proje yok. İlk projeyi ekleyin.</div>
+      <% } else { %>
+        <div class="items">
+          <% projects.forEach(function (p) { %>
+            <div class="item">
+              <% if (p.image) { %><img class="item__thumb" src="<%= p.image %>" alt="" /><% } else { %><div class="item__thumb"></div><% } %>
+              <div class="item__main">
+                <div class="item__title"><%= p.name %>
+                  <span class="badge <%= p.published ? 'badge--on' : 'badge--off' %>"><%= p.published ? 'Yayında' : 'Taslak' %></span>
+                </div>
+                <div class="item__meta"><%= p.meta || '—' %> · /projeler/<%= p.slug %></div>
+              </div>
+              <div class="item__actions">
+                <a href="/admin/projects/<%= p.id %>/edit" class="btn btn--sm">Düzenle</a>
+                <form method="POST" action="/admin/projects/<%= p.id %>/delete" onsubmit="return confirm('Bu proje silinsin mi?');">
+                  <button type="submit" class="btn btn--sm btn--danger">Sil</button>
+                </form>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- Blog -->
+    <section class="section-block">
+      <div class="section-block__head">
+        <div>
+          <h2 class="section-block__title">Blog Yazıları</h2>
+          <span class="section-block__count"><%= posts.length %> kayıt</span>
+        </div>
+        <a href="/admin/posts/new" class="btn btn--primary">+ Yeni Yazı</a>
+      </div>
+
+      <% if (!posts.length) { %>
+        <div class="empty">Henüz blog yazısı yok.</div>
+      <% } else { %>
+        <div class="items">
+          <% posts.forEach(function (post) { %>
+            <div class="item">
+              <% if (post.cover) { %><img class="item__thumb" src="<%= post.cover %>" alt="" /><% } else { %><div class="item__thumb"></div><% } %>
+              <div class="item__main">
+                <div class="item__title"><%= post.title %>
+                  <span class="badge <%= post.published ? 'badge--on' : 'badge--off' %>"><%= post.published ? 'Yayında' : 'Taslak' %></span>
+                </div>
+                <div class="item__meta"><%= formatDate(post.publishedAt) %> · /blog/<%= post.slug %></div>
+              </div>
+              <div class="item__actions">
+                <a href="/admin/posts/<%= post.id %>/edit" class="btn btn--sm">Düzenle</a>
+                <form method="POST" action="/admin/posts/<%= post.id %>/delete" onsubmit="return confirm('Bu yazı silinsin mi?');">
+                  <button type="submit" class="btn btn--sm btn--danger">Sil</button>
+                </form>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </section>
+  </div>
+</body>
+</html>

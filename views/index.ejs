@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="description" content="<%= site.meta.description %>" />
-  <title><%= site.meta.title %></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/css/main.css?v=10" />
+  <%- include('partials/head', { site: site, seo: seo }) %>
 </head>
 <body>
   <%- include('partials/cursor') %>
@@ -127,11 +120,11 @@
                 </svg>
               </div>
 
-              <% site.projects.items.forEach(function (p, i) { %>
+              <% projects.forEach(function (p, i) { %>
                 <div class="pacman-node pacman-node--<%= p.side %>" data-node="<%= i %>">
                   <span class="pacman-node__pellet" aria-hidden="true"></span>
                   <span class="pacman-node__link" aria-hidden="true"></span>
-                  <a href="#contact" class="pacman-node__seat interactive" title="<%= p.name %>">
+                  <a href="<%= p.slug ? ('/projeler/' + p.slug) : '#contact' %>" class="pacman-node__seat interactive" title="<%= p.name %>">
                     <span class="pacman-node__no"><%= p.id %></span>
                     <span class="pacman-node__name"><%= p.name %></span>
                   </a>

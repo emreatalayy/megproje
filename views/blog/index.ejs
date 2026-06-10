@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <%- include('../partials/head', { site: site, seo: seo }) %>
+  <link rel="stylesheet" href="/css/pages.css?v=11" />
+</head>
+<body>
+  <%- include('../partials/nav') %>
+
+  <main>
+    <div class="page-wrap">
+      <header class="page-head">
+        <p class="page-head__eyebrow">Günlük</p>
+        <h1 class="page-head__title">Blog</h1>
+        <p class="page-head__lead">Mimarlık, iç mekan ve kentsel tasarım üzerine notlar, projeler ve süreçler.</p>
+      </header>
+
+      <% if (!posts || posts.length === 0) { %>
+        <div class="empty-state">
+          <p>Henüz yazı yayınlanmadı. Yakında burada olacak.</p>
+        </div>
+      <% } else { %>
+        <div class="post-grid">
+          <% posts.forEach(function (post) { %>
+            <article class="post-card">
+              <a href="/blog/<%= post.slug %>" class="post-card__media interactive" aria-label="<%= post.title %>">
+                <% if (post.cover) { %>
+                  <img src="<%= post.cover %>" alt="<%= post.coverAlt || post.title %>" loading="lazy" />
+                <% } %>
+              </a>
+              <div class="post-card__body">
+                <div class="post-card__meta">
+                  <span><%= formatDate(post.publishedAt) %></span>
+                  <span><%= post.readingTime %> dk okuma</span>
+                </div>
+                <h2 class="post-card__title">
+                  <a href="/blog/<%= post.slug %>" class="interactive"><%= post.title %></a>
+                </h2>
+                <p class="post-card__excerpt"><%= post.excerpt %></p>
+                <% if (post.tags && post.tags.length) { %>
+                  <div class="post-tags">
+                    <% post.tags.slice(0, 3).forEach(function (t) { %><span class="post-tag"><%= t %></span><% }); %>
+                  </div>
+                <% } %>
+                <a href="/blog/<%= post.slug %>" class="post-card__more interactive">Devamını oku →</a>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script>window.MEG_SITE = { contactEmail: "<%= site.contact.email %>" };</script>
+  <script src="/js/main.js?v=11"></script>
+</body>
+</html>

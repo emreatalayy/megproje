@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title><%= post ? 'Yazı Düzenle' : 'Yeni Yazı' %> | MEG Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/admin.css?v=1" />
+</head>
+<body class="admin">
+  <header class="admin-top">
+    <div class="admin-top__brand">MEG<small>Blog</small></div>
+    <div class="admin-top__nav">
+      <a href="/admin" class="btn btn--ghost btn--sm">← Panele Dön</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <h1 class="section-block__title" style="margin-bottom:1.5rem;"><%= post ? 'Yazı Düzenle' : 'Yeni Yazı' %></h1>
+
+    <% if (error) { %><div class="alert alert--error"><%= error %></div><% } %>
+
+    <form class="form" method="POST" action="<%= action %>" enctype="multipart/form-data">
+      <div class="field">
+        <label for="title">Başlık *</label>
+        <input type="text" id="title" name="title" required value="<%= post ? post.title : '' %>" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="slug">URL Kısaltması (slug)</label>
+          <input type="text" id="slug" name="slug" placeholder="otomatik" value="<%= post && post.slug ? post.slug : '' %>" />
+          <p class="field__hint">Boş bırakılırsa başlıktan üretilir.</p>
+        </div>
+        <div class="field">
+          <label for="author">Yazar</label>
+          <input type="text" id="author" name="author" value="<%= post ? (post.author || 'MEG Mimarlık') : 'MEG Mimarlık' %>" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="excerpt">Özet (SEO açıklaması)</label>
+        <textarea id="excerpt" name="excerpt" placeholder="Arama sonuçlarında görünecek kısa özet (boşsa içerikten üretilir)." style="min-height:80px;"><%= post ? post.excerpt : '' %></textarea>
+      </div>
+
+      <div class="field">
+        <label for="content">İçerik (HTML destekler) *</label>
+        <textarea id="content" name="content" class="tall" required placeholder="<p>Yazınızı buraya yazın. &lt;h2&gt;, &lt;p&gt;, &lt;blockquote&gt;, &lt;ul&gt; gibi etiketler kullanılabilir.</p>"><%= post ? post.content : '' %></textarea>
+        <p class="field__hint">Paragraflar için &lt;p&gt;, alt başlık için &lt;h2&gt;, alıntı için &lt;blockquote&gt; kullanabilirsiniz.</p>
+      </div>
+
+      <div class="field">
+        <label for="cover">Kapak Görseli</label>
+        <div class="file-drop">
+          <% if (post && post.cover) { %><img src="<%= post.cover %>" alt="" /><% } %>
+          <div style="flex:1;">
+            <input type="file" id="cover" name="cover" accept="image/*" <%= storageReady ? '' : 'disabled' %> />
+            <% if (!storageReady) { %>
+              <p class="field__hint">Storage tanımlı değil — aşağıya resim URL'si girin.</p>
+            <% } else if (post && post.cover) { %>
+              <p class="field__hint">Yeni dosya seçmezseniz mevcut kapak korunur.</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="coverUrl">veya Kapak URL'si</label>
+        <input type="url" id="coverUrl" name="coverUrl" placeholder="https://..." value="<%= post && post.cover ? post.cover : '' %>" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="coverAlt">Kapak Alt Metni (SEO)</label>
+          <input type="text" id="coverAlt" name="coverAlt" value="<%= post ? (post.coverAlt || '') : '' %>" />
+        </div>
+        <div class="field">
+          <label for="tags">Etiketler (virgülle)</label>
+          <input type="text" id="tags" name="tags" placeholder="mimarlık, tasarım" value="<%= post && post.tags ? (Array.isArray(post.tags) ? post.tags.join(', ') : post.tags) : '' %>" />
+        </div>
+      </div>
+
+      <div class="field check">
+        <input type="checkbox" id="published" name="published" <%= (!post || post.published) ? 'checked' : '' %> />
+        <label for="published">Yayında</label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn--primary">Kaydet</button>
+        <a href="/admin" class="btn btn--ghost">İptal</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    var fileInput = document.getElementById('cover');
+    var urlInput = document.getElementById('coverUrl');
+    if (fileInput && urlInput) {
+      fileInput.addEventListener('change', function () {
+        if (fileInput.files && fileInput.files.length) urlInput.value = '';
+      });
+    }
+  </script>
+</body>
+</html>

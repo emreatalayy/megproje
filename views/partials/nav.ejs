@@ -1,11 +1,11 @@
 <header class="nav" id="nav" role="banner">
-  <a href="#" class="nav__logo interactive">MEG</a>
+  <a href="/" class="nav__logo interactive">MEG</a>
   <nav class="nav__links" id="navLinks" aria-label="Ana menü">
     <% site.nav.forEach(function (link) { %>
       <a href="<%= link.href %>" class="interactive"><%= link.label %></a>
     <% }); %>
   </nav>
-  <a href="#contact" class="nav__cta interactive">Proje Başlat</a>
+  <a href="/#contact" class="nav__cta interactive">Proje Başlat</a>
   <button class="nav__burger" type="button" aria-label="Menüyü aç" aria-expanded="false" id="navBurger">
     <span></span><span></span><span></span>
   </button>
@@ -15,6 +15,6 @@
     <% site.nav.forEach(function (link) { %>
       <a href="<%= link.href %>" class="nav-mobile__link interactive"><%= link.label %></a>
     <% }); %>
-    <a href="#contact" class="nav-mobile__cta interactive">Proje Başlat</a>
+    <a href="/#contact" class="nav-mobile__cta interactive">Proje Başlat</a>
   </nav>
 </div>

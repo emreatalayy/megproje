@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <%- include('../partials/head', { site: site, seo: seo }) %>
+  <link rel="stylesheet" href="/css/pages.css?v=11" />
+</head>
+<body>
+  <%- include('../partials/nav') %>
+
+  <main>
+    <div class="page-wrap">
+      <article class="article">
+        <a href="/blog" class="back-link interactive">← Tüm yazılar</a>
+
+        <div class="article__meta">
+          <span><%= formatDate(post.publishedAt) %></span>
+          <span><%= post.readingTime %> dk okuma</span>
+          <span><%= post.author %></span>
+        </div>
+
+        <h1 class="article__title"><%= post.title %></h1>
+
+        <% if (post.cover) { %>
+          <div class="article__cover">
+            <img src="<%= post.cover %>" alt="<%= post.coverAlt || post.title %>" />
+          </div>
+        <% } %>
+
+        <div class="article__content"><%- post.content %></div>
+
+        <% if (post.tags && post.tags.length) { %>
+          <div class="post-tags" style="margin-top:2.5rem;">
+            <% post.tags.forEach(function (t) { %><span class="post-tag"><%= t %></span><% }); %>
+          </div>
+        <% } %>
+      </article>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script>window.MEG_SITE = { contactEmail: "<%= site.contact.email %>" };</script>
+  <script src="/js/main.js?v=11"></script>
+</body>
+</html>
