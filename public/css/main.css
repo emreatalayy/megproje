@@ -791,63 +791,63 @@
       transform: scale(0);
     }
 
-    /* Pellet'i etikete bağlayan kesik çizgi */
+    /* Pellet'i etikete bağlayan dikey kesik çizgi (yatay rayda üst/alt) */
     .pacman-node__link {
       position: absolute;
-      top: 50%;
-      height: 0;
-      border-top: 2px dotted var(--pac);
+      left: 50%;
+      width: 0;
+      border-left: 2px dotted var(--pac);
       opacity: 0.55;
     }
 
+    /* --right => etiket rayın üstünde */
     .pacman-node--right .pacman-node__link {
-      left: 50%;
-      width: 46px;
-      margin-left: 8px;
+      bottom: 50%;
+      height: 38px;
+      margin-bottom: 8px;
     }
 
+    /* --left => etiket rayın altında */
     .pacman-node--left .pacman-node__link {
-      right: 50%;
-      width: 46px;
-      margin-right: 8px;
+      top: 50%;
+      height: 38px;
+      margin-top: 8px;
     }
 
-    /* Aşama etiketi — poster tarzı */
+    /* Aşama etiketi — poster tarzı.
+       Sıfır genişlikli düğüm üzerinde güvenilir yatay ortalama için
+       sabit genişlik + negatif margin kullanılır (yüzde translate yerine). */
     .pacman-node__seat {
       position: absolute;
-      top: 50%;
+      left: 50%;
+      width: 160px;
+      margin-left: -80px;
       z-index: 1;
-      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 0.2rem;
-      max-width: 150px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--pac);
+      text-align: center;
       color: var(--text-primary);
       transition: color 0.3s var(--ease-out), transform 0.3s var(--ease-out);
     }
 
     .pacman-node--right .pacman-node__seat {
-      left: 50%;
-      margin-left: 60px;
-      text-align: left;
-      align-items: flex-start;
+      bottom: 50%;
+      margin-bottom: 52px;
     }
 
     .pacman-node--left .pacman-node__seat {
-      right: 50%;
-      margin-right: 60px;
-      text-align: right;
-      align-items: flex-end;
+      top: 50%;
+      margin-top: 52px;
     }
 
     .pacman-node__seat:hover {
       color: var(--pac);
     }
 
-    .pacman-node--right .pacman-node__seat:hover { transform: translateY(-50%) translateX(3px); }
-    .pacman-node--left .pacman-node__seat:hover { transform: translateY(-50%) translateX(-3px); }
+    .pacman-node--right .pacman-node__seat:hover { transform: translateY(-3px); }
+    .pacman-node--left .pacman-node__seat:hover { transform: translateY(3px); }
 
     .pacman-node.is-active .pacman-node__seat {
       color: var(--pac);
@@ -869,11 +869,107 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       line-height: 1.25;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--pac);
       transition: letter-spacing 0.4s var(--ease-out);
     }
 
     .pacman-node__seat:hover .pacman-node__name {
       letter-spacing: 0.2em;
+    }
+
+    /* Yol sonu — "STAGE CLEAR" kazanma ekranı */
+    .pacman-win {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem;
+      background: color-mix(in srgb, var(--bg-secondary) 82%, transparent);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.45s var(--ease-out), visibility 0.45s;
+    }
+
+    .pacman-view.is-won .pacman-win {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .pacman-win__inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      transform: translateY(14px) scale(0.96);
+      transition: transform 0.5s var(--ease-out);
+    }
+
+    .pacman-view.is-won .pacman-win__inner {
+      transform: translateY(0) scale(1);
+    }
+
+    .pacman-win__pac {
+      width: 64px;
+      height: 64px;
+      background: var(--pac);
+      border-radius: 50%;
+      clip-path: polygon(100% 22%, 48% 50%, 100% 78%, 8% 90%, 8% 10%);
+      animation: pacmanWinChomp 0.34s steps(2) infinite;
+    }
+
+    @keyframes pacmanWinChomp {
+      0% { clip-path: polygon(100% 12%, 46% 50%, 100% 88%, 8% 88%, 8% 12%); }
+      100% { clip-path: polygon(100% 40%, 52% 50%, 100% 60%, 8% 88%, 8% 12%); }
+    }
+
+    .pacman-win__stage {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .pacman-win__title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--text-primary);
+      max-width: 18ch;
+    }
+
+    .pacman-win__sub {
+      font-weight: 300;
+      color: var(--text-muted);
+    }
+
+    .pacman-win__cta {
+      margin-top: 0.4rem;
+      display: inline-block;
+      padding: 0.7rem 1.5rem;
+      border: 1px solid var(--pac);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--pac);
+      transition: background 0.3s var(--ease-out), color 0.3s var(--ease-out), transform 0.3s var(--ease-out);
+    }
+
+    .pacman-win__cta:hover {
+      background: var(--pac);
+      color: var(--white);
+      transform: translateY(-2px);
     }
 
     /* ABOUT */
@@ -1453,7 +1549,8 @@
       .pacman-rail__svg,
       .pacman-player,
       .pacman-ghost,
-      .pacman-scroll__bar {
+      .pacman-scroll__bar,
+      .pacman-win {
         display: none;
       }
 
@@ -1497,6 +1594,10 @@
       .pacman-node:nth-child(3) { animation-delay: 0.19s; }
       .pacman-node:nth-child(4) { animation-delay: 0.26s; }
       .pacman-node:nth-child(5) { animation-delay: 0.33s; }
+      .pacman-node:nth-child(6) { animation-delay: 0.40s; }
+      .pacman-node:nth-child(7) { animation-delay: 0.47s; }
+      .pacman-node:nth-child(8) { animation-delay: 0.54s; }
+      .pacman-node:nth-child(n+9) { animation-delay: 0.6s; }
 
       @keyframes nodeSlideIn {
         to { opacity: 1; transform: translateX(0); }
@@ -1517,9 +1618,13 @@
         position: static;
         transform: none;
         margin: 0;
+        width: auto;
         max-width: none;
         text-align: left;
         align-items: flex-start;
+      }
+
+      .pacman-node__name {
         border-bottom: none;
         padding-bottom: 0;
       }

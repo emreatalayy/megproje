@@ -236,41 +236,29 @@
   var pacmanGhost = document.getElementById("pacmanGhost");
   var pacmanScrollFill = document.getElementById("pacmanScrollFill");
   var pacmanEatMaskPath = document.getElementById("pacmanEatMaskPath");
+  var pacmanWin = document.getElementById("pacmanWin");
   var pacmanSvg = pacmanRail && pacmanRail.querySelector(".pacman-rail__svg");
   var pacmanNodes = document.querySelectorAll(".pacman-node");
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  /* Aşama düğümlerinin yol (viewBox) üzerindeki çapa noktaları */
-  var NODE_ANCHORS = [
-    { x: 440, y: 110 },
-    { x: 200, y: 290 },
-    { x: 440, y: 470 },
-    { x: 200, y: 650 },
-    { x: 440, y: 830 },
-  ];
-  var NODE_STOPS = [0.1, 0.3, 0.5, 0.7, 0.9];
+  /* Aşama düğümlerini yatay yol üzerine proje sayısına göre eşit dağıt.
+     Admin panelinden proje eklenince/silinince otomatik yeniden konumlanır. */
+  var NODE_STOPS = [];
 
   function computeNodeStops() {
-    if (!pacmanPath) return;
-    var len = pacmanPath.getTotalLength();
-    if (!len) return;
-    NODE_ANCHORS.forEach(function (anchor, idx) {
-      if (idx >= pacmanNodes.length) return;
-      var best = 0;
-      var bestDist = Infinity;
-      for (var i = 0; i <= 260; i++) {
-        var t = i / 260;
-        var p = pacmanPath.getPointAtLength(len * t);
-        var dx = p.x - anchor.x;
-        var dy = p.y - anchor.y;
-        var d = dx * dx + dy * dy;
-        if (d < bestDist) {
-          bestDist = d;
-          best = t;
-        }
-      }
-      NODE_STOPS[idx] = best;
-    });
+    var n = pacmanNodes.length;
+    NODE_STOPS = [];
+    if (!n) return;
+    if (n === 1) {
+      NODE_STOPS = [0.5];
+      return;
+    }
+    var startPad = 0.07;
+    var endPad = 0.07;
+    var span = 1 - startPad - endPad;
+    for (var i = 0; i < n; i++) {
+      NODE_STOPS.push(startPad + span * (i / (n - 1)));
+    }
   }
 
   computeNodeStops();
@@ -363,6 +351,7 @@
       });
       if (pacmanScrollFill) pacmanScrollFill.style.width = "0%";
       if (pacmanEatMaskPath) pacmanEatMaskPath.setAttribute("stroke-dashoffset", "0");
+      pacmanView.classList.remove("is-won");
       clearPacmanNodeLayout();
       return;
     }
@@ -416,6 +405,9 @@
       node.classList.toggle("is-active", progress >= stop - 0.06 && progress <= stop + 0.1);
       node.classList.toggle("is-eaten", progress >= stop - 0.02);
     });
+
+    /* Yol sonuna gelince "oyun bitti" ekranı */
+    pacmanView.classList.toggle("is-won", progress > 0.985);
   }
 
   function pacmanFrame() {

@@ -59,25 +59,17 @@
         <div class="pacman-scroll__sticky">
           <div class="pacman-view" id="pacmanView">
             <div class="pacman-rail" id="pacmanRail">
-              <svg class="pacman-rail__svg" viewBox="0 0 640 960" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+              <svg class="pacman-rail__svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
                 <defs>
-                  <mask id="pacmanEatMask" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="960">
+                  <mask id="pacmanEatMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="360">
                     <path
                       id="pacmanEatMaskPath"
-                      d="M 160 110
-                         L 436 110 Q 480 110 480 154
-                         L 480 246 Q 480 290 436 290
-                         L 204 290 Q 160 290 160 334
-                         L 160 426 Q 160 470 204 470
-                         L 436 470 Q 480 470 480 514
-                         L 480 606 Q 480 650 436 650
-                         L 204 650 Q 160 650 160 694
-                         L 160 786 Q 160 830 204 830
-                         L 470 830"
+                      d="M 40 180 Q 180 80 320 180 Q 460 280 600 180 Q 740 80 880 180 Q 1020 280 1160 180"
                       pathLength="1"
                       fill="none"
                       stroke="#ffffff"
-                      stroke-width="48"
+                      stroke-width="40"
+                      stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-dasharray="1 1"
                       stroke-dashoffset="0"
@@ -86,16 +78,7 @@
                 </defs>
                 <path
                   id="pacmanPath"
-                  d="M 160 110
-                     L 436 110 Q 480 110 480 154
-                     L 480 246 Q 480 290 436 290
-                     L 204 290 Q 160 290 160 334
-                     L 160 426 Q 160 470 204 470
-                     L 436 470 Q 480 470 480 514
-                     L 480 606 Q 480 650 436 650
-                     L 204 650 Q 160 650 160 694
-                     L 160 786 Q 160 830 204 830
-                     L 470 830"
+                  d="M 40 180 Q 180 80 320 180 Q 460 280 600 180 Q 740 80 880 180 Q 1020 280 1160 180"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="5"
@@ -130,6 +113,16 @@
                   </a>
                 </div>
               <% }); %>
+            </div>
+
+            <div class="pacman-win" id="pacmanWin" aria-hidden="true">
+              <div class="pacman-win__inner">
+                <span class="pacman-win__pac" aria-hidden="true"></span>
+                <p class="pacman-win__stage">STAGE CLEAR</p>
+                <p class="pacman-win__title">Tebrikler, tüm projeleri keşfettin!</p>
+                <p class="pacman-win__sub">Sıradaki proje seninki olsun.</p>
+                <a href="#contact" class="pacman-win__cta interactive">Projeni başlatalım →</a>
+              </div>
             </div>
           </div>
           <div class="pacman-scroll__bar" aria-hidden="true">
@@ -234,6 +227,6 @@
   <script>
     window.MEG_SITE = { contactEmail: "<%= site.contact.email %>" };
   </script>
-  <script src="/js/main.js?v=10"></script>
+  <script src="/js/main.js?v=12"></script>
 </body>
 </html>

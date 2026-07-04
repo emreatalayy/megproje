@@ -172,8 +172,8 @@ module.exports = {
   contact: {
     title: "Birlikte tasarlayalım",
     email: "info@megproje.net",
-    phone: "0543 884 07 41",
-    phoneHref: "+905438840741",
+    phone: "0543 103 20 00",
+    phoneHref: "+905431032000",
     address: {
       line1: "Sakarya, Uluyayla Cd. No:52 A",
       line2: "42100 Selçuklu / Konya",
