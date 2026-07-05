@@ -1,5 +1,7 @@
 <header class="nav" id="nav" role="banner">
-  <a href="/" class="nav__logo interactive">MEG</a>
+  <a href="/" class="nav__logo interactive" aria-label="MEG Proje — ana sayfa">
+    <img src="/img/meg-logo-mark.svg" alt="MEG Proje" class="nav__logo-img" />
+  </a>
   <nav class="nav__links" id="navLinks" aria-label="Ana menü">
     <% site.nav.forEach(function (link) { %>
       <a href="<%= link.href %>" class="interactive"><%= link.label %></a>

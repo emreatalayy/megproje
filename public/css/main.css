@@ -171,17 +171,20 @@
     }
 
     .nav__logo {
-      font-family: var(--font-serif);
-      font-size: 1.75rem;
-      font-style: italic;
-      font-weight: 500;
-      letter-spacing: -0.02em;
-      transition: color 0.35s var(--ease-out), letter-spacing 0.45s var(--ease-out);
+      display: inline-flex;
+      align-items: center;
+      transition: opacity 0.35s var(--ease-out), transform 0.45s var(--ease-out);
+    }
+
+    .nav__logo-img {
+      display: block;
+      height: 34px;
+      width: auto;
     }
 
     .nav__logo:hover {
-      color: var(--accent);
-      letter-spacing: 0.01em;
+      opacity: 0.72;
+      transform: translateY(-1px);
     }
 
     .nav__links {
@@ -1388,10 +1391,14 @@
     }
 
     .footer__logo {
-      font-family: var(--font-serif);
-      font-size: 1.35rem;
-      font-style: italic;
-      color: var(--white);
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .footer__logo-img {
+      display: block;
+      height: 40px;
+      width: auto;
     }
 
     .footer__copy {
