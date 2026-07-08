@@ -6,17 +6,71 @@
   var PACMAN_LAYOUT_BREAKPOINT = 901;
 
   var nav = document.getElementById("nav");
+  var navProgress = document.getElementById("navProgress");
+  var heroDeco = document.querySelector(".hero__deco");
+  var waFab = document.querySelector(".wa-fab");
+  var motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function isMobileViewport() {
+    return window.innerWidth < MOBILE_BREAKPOINT;
+  }
+
+  /* Mobil scroll davranışları: nav gizle/göster, okuma çizgisi,
+     hero deco parallax, WhatsApp FAB küçülmesi */
+  var lastScrollY = window.scrollY;
+  var waFabIdleTimer = null;
 
   function onScrollNav() {
     if (!nav) return;
-    if (window.scrollY > SCROLL_NAV_THRESHOLD) {
+    var y = window.scrollY;
+
+    if (y > SCROLL_NAV_THRESHOLD) {
       nav.classList.add("nav--scrolled");
     } else {
       nav.classList.remove("nav--scrolled");
     }
+
+    if (isMobileViewport() && !document.body.classList.contains("nav-open")) {
+      var goingDown = y > lastScrollY + 4;
+      var goingUp = y < lastScrollY - 4;
+
+      if (goingDown && y > 160) {
+        nav.classList.add("nav--hidden");
+        if (waFab) {
+          waFab.classList.add("wa-fab--mini");
+          window.clearTimeout(waFabIdleTimer);
+          waFabIdleTimer = window.setTimeout(function () {
+            waFab.classList.remove("wa-fab--mini");
+          }, 900);
+        }
+      } else if (goingUp || y <= 160) {
+        nav.classList.remove("nav--hidden");
+        if (waFab) waFab.classList.remove("wa-fab--mini");
+      }
+
+      if (navProgress) {
+        var docRange = document.documentElement.scrollHeight - window.innerHeight;
+        navProgress.style.transform =
+          "scaleX(" + (docRange > 0 ? Math.min(1, y / docRange) : 0) + ")";
+      }
+
+      if (heroDeco && !motionQuery.matches) {
+        heroDeco.style.transform =
+          y < window.innerHeight
+            ? "translate3d(0," + y * 0.18 + "px,0)"
+            : "";
+      }
+    } else {
+      nav.classList.remove("nav--hidden");
+      if (waFab) waFab.classList.remove("wa-fab--mini");
+      if (heroDeco) heroDeco.style.transform = "";
+    }
+
+    lastScrollY = y;
   }
 
   window.addEventListener("scroll", onScrollNav, { passive: true });
+  window.addEventListener("resize", onScrollNav);
   onScrollNav();
 
   /* Mobil menü */
@@ -25,6 +79,7 @@
 
   function setNavOpen(open) {
     if (!navBurger || !navMobile) return;
+    if (open && nav) nav.classList.remove("nav--hidden");
     navBurger.classList.toggle("is-open", open);
     navBurger.setAttribute("aria-expanded", open ? "true" : "false");
     navBurger.setAttribute("aria-label", open ? "Menüyü kapat" : "Menüyü aç");
@@ -108,7 +163,8 @@
   var navAnchors = document.querySelectorAll(
     '.nav__links a[href*="#"], .nav-mobile__link[href*="#"]'
   );
-  var pageSections = document.querySelectorAll(".page-section[id]");
+  /* id'siz bölümler de (ör. felsefe) is-section-visible alsın */
+  var pageSections = document.querySelectorAll(".page-section");
 
   function hashId(href) {
     var parts = String(href || "").split("#");
@@ -227,6 +283,24 @@
     });
   }
 
+  /* Felsefe alıntısı — mobilde kelime kelime reveal için span'lere böl */
+  var philosophyText = document.querySelector(".philosophy__text");
+
+  if (philosophyText && !motionQuery.matches) {
+    var quoteWords = (philosophyText.textContent || "").trim().split(/\s+/);
+    philosophyText.textContent = "";
+    quoteWords.forEach(function (word, i) {
+      var span = document.createElement("span");
+      span.className = "ph-word";
+      span.textContent = word;
+      span.style.setProperty("--wi", String(i));
+      philosophyText.appendChild(span);
+      if (i < quoteWords.length - 1) {
+        philosophyText.appendChild(document.createTextNode(" "));
+      }
+    });
+  }
+
   /* Projeler — scroll ile Pac-Man + yatay kayma */
   var pacmanScroll = document.getElementById("pacmanScroll");
   var pacmanView = document.getElementById("pacmanView");
@@ -277,6 +351,22 @@
     var scrollRange = pacmanScroll.offsetHeight - window.innerHeight;
     if (scrollRange <= 0) return 0;
     return Math.min(1, Math.max(0, -rect.top / scrollRange));
+  }
+
+  /* Mobil: ray viewport'un %85'ine girince başlar, alt kenarı %25'e
+     ulaşınca biter — kısa listelerde de yumuşak, uzun bir scroll aralığı verir */
+  function getMobileRailProgress() {
+    if (!pacmanRail) return 0;
+    var rect = pacmanRail.getBoundingClientRect();
+    if (rect.height <= 0) return 0;
+    var vh = window.innerHeight;
+    var range = 0.6 * vh + rect.height;
+    if (range <= 0) return 0;
+    return Math.min(1, Math.max(0, (0.85 * vh - rect.top) / range));
+  }
+
+  function getPacmanTarget() {
+    return pacmanDesktopLayout() ? getPacmanProgress() : getMobileRailProgress();
   }
 
   function pathPointOnRail(ratio) {
@@ -341,18 +431,39 @@
     }
 
     if (!pacmanDesktopLayout()) {
-      if (pacmanWasDesktop === false) return;
-      pacmanWasDesktop = false;
-      pacmanRail.style.transform = "";
-      pacmanPlayer.style.opacity = "0";
-      if (pacmanGhost) pacmanGhost.style.opacity = "0";
+      /* Mobil: Pac-Man dikey yem hattı boyunca scroll ile iner */
+      if (pacmanWasDesktop !== false) {
+        pacmanWasDesktop = false;
+        pacmanRail.style.transform = "";
+        if (pacmanScrollFill) pacmanScrollFill.style.width = "0%";
+        if (pacmanEatMaskPath) pacmanEatMaskPath.setAttribute("stroke-dashoffset", "0");
+        clearPacmanNodeLayout();
+      }
+
+      var MOBILE_RAIL_X = 11; /* CSS'teki .pacman-rail::before hattıyla aynı merkez */
+      var railHeight = pacmanRail.offsetHeight;
+      var mProgress = pacmanProgress;
+      var pacY = mProgress * railHeight;
+
+      pacmanPlayer.style.opacity = mProgress > 0.01 ? "1" : "0";
+      pacmanPlayer.style.left = MOBILE_RAIL_X + "px";
+      pacmanPlayer.style.top = pacY + "px";
+      pacmanPlayer.style.transform = "translate(-50%, -50%) rotate(90deg)";
+
+      if (pacmanGhost) {
+        pacmanGhost.style.left = MOBILE_RAIL_X + "px";
+        pacmanGhost.style.top = pacmanGhostProgress * railHeight + "px";
+        pacmanGhost.style.transform = "translate(-50%, -50%)";
+        pacmanGhost.style.opacity = mProgress > 0.05 ? "1" : "0";
+      }
+
       pacmanNodes.forEach(function (node) {
-        node.classList.remove("is-active", "is-eaten");
+        var nodeY = node.offsetTop + node.offsetHeight / 2;
+        node.classList.toggle("is-eaten", pacY >= nodeY - 4);
+        node.classList.toggle("is-active", pacY < nodeY && nodeY - pacY < 44);
       });
-      if (pacmanScrollFill) pacmanScrollFill.style.width = "0%";
-      if (pacmanEatMaskPath) pacmanEatMaskPath.setAttribute("stroke-dashoffset", "0");
-      pacmanView.classList.remove("is-won");
-      clearPacmanNodeLayout();
+
+      pacmanView.classList.toggle("is-won", mProgress > 0.98);
       return;
     }
 
@@ -411,7 +522,7 @@
   }
 
   function pacmanFrame() {
-    var target = getPacmanProgress();
+    var target = getPacmanTarget();
     var ghostTarget = Math.max(0, target - 0.13);
 
     if (reducedMotion.matches) {
@@ -444,7 +555,7 @@
 
   function syncPacman() {
     computeNodeStops();
-    pacmanProgress = getPacmanProgress();
+    pacmanProgress = getPacmanTarget();
     pacmanGhostProgress = Math.max(0, pacmanProgress - 0.13);
     renderPacman();
   }

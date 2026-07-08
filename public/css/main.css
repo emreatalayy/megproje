@@ -159,8 +159,31 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 var(--page-pad);
-      transition: background 0.45s var(--ease-out), backdrop-filter 0.45s var(--ease-out), border-color 0.45s var(--ease-out);
+      transition:
+        background 0.45s var(--ease-out),
+        backdrop-filter 0.45s var(--ease-out),
+        border-color 0.45s var(--ease-out),
+        transform 0.5s var(--ease-out);
       border-bottom: 1px solid transparent;
+    }
+
+    /* Mobil: aşağı kaydırınca nav gizlenir, yukarı kaydırınca geri gelir */
+    .nav--hidden {
+      transform: translateY(-102%);
+    }
+
+    /* Mobil: nav altında ince okuma ilerleme çizgisi */
+    .nav__progress {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left center;
+      pointer-events: none;
     }
 
     .nav--scrolled {
@@ -280,6 +303,8 @@
       z-index: 999;
       overflow: hidden;
       background: rgba(26, 23, 20, 0.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.35s ease, visibility 0.35s ease;
@@ -318,8 +343,29 @@
       font-size: 12px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      transition: color 0.35s var(--ease-out), padding-left 0.35s var(--ease-out);
+      opacity: 0;
+      transform: translateX(26px);
+      transition:
+        color 0.35s var(--ease-out),
+        padding-left 0.35s var(--ease-out),
+        opacity 0.4s var(--ease-out),
+        transform 0.55s var(--ease-out);
     }
+
+    /* Menü açılınca linkler sırayla süzülür */
+    .nav-mobile.is-open .nav-mobile__link {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Gecikme sadece opacity+transform'a — renk/padding tepkisi anlık kalsın
+       (transition sırası: color, padding-left, opacity, transform) */
+    .nav-mobile.is-open .nav-mobile__link:nth-child(1) { transition-delay: 0s, 0s, 0.08s, 0.08s; }
+    .nav-mobile.is-open .nav-mobile__link:nth-child(2) { transition-delay: 0s, 0s, 0.15s, 0.15s; }
+    .nav-mobile.is-open .nav-mobile__link:nth-child(3) { transition-delay: 0s, 0s, 0.22s, 0.22s; }
+    .nav-mobile.is-open .nav-mobile__link:nth-child(4) { transition-delay: 0s, 0s, 0.29s, 0.29s; }
+    .nav-mobile.is-open .nav-mobile__link:nth-child(5) { transition-delay: 0s, 0s, 0.36s, 0.36s; }
+    .nav-mobile.is-open .nav-mobile__link:nth-child(n+6) { transition-delay: 0s, 0s, 0.42s, 0.42s; }
 
     .nav-mobile__link.is-active {
       color: var(--accent);
@@ -336,10 +382,20 @@
       text-align: center;
       background: var(--accent);
       color: var(--white);
+      opacity: 0;
+      transform: translateY(16px);
       transition:
         background 0.35s var(--ease-out),
-        transform 0.3s var(--ease-spring),
-        box-shadow 0.35s var(--ease-out);
+        transform 0.5s var(--ease-spring),
+        box-shadow 0.35s var(--ease-out),
+        opacity 0.4s var(--ease-out);
+    }
+
+    /* CTA en son, yaylanarak gelir */
+    .nav-mobile.is-open .nav-mobile__cta {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0s, 0.4s, 0s, 0.4s;
     }
 
     .nav-mobile__cta:hover {
@@ -633,6 +689,15 @@
       @keyframes revealFade {
         from { opacity: 0; filter: blur(6px); }
         to   { opacity: 1; filter: blur(0);   }
+      }
+
+      /* Mobil: blur pahalı — sadece opacity animasyonu */
+      @media (max-width: 768px) {
+        .reveal { animation-name: revealFadeMobile; }
+        @keyframes revealFadeMobile {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
       }
     }
 
@@ -1535,6 +1600,7 @@
       .footer__social { justify-content: center; }
     }
 
+    /* ===== Mobil Pac-Man — dikey ray ===== */
     @media (max-width: 900px) {
       .pacman-scroll {
         height: auto;
@@ -1551,13 +1617,12 @@
         border: none;
         background: transparent;
         padding: 0;
+        overflow: visible;
+        contain: none;
       }
 
       .pacman-rail__svg,
-      .pacman-player,
-      .pacman-ghost,
-      .pacman-scroll__bar,
-      .pacman-win {
+      .pacman-scroll__bar {
         display: none;
       }
 
@@ -1569,8 +1634,37 @@
         height: auto;
         display: flex;
         flex-direction: column;
-        gap: 1.1rem;
+        gap: 1.35rem;
         transform: none !important;
+        padding: 0.75rem 0;
+      }
+
+      /* Dikey yem hattı — Pac-Man bu çizgi boyunca iner */
+      .pacman-rail::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: repeating-linear-gradient(
+          to bottom,
+          var(--pac) 0 4px,
+          transparent 4px 14px
+        );
+        opacity: 0.3;
+      }
+
+      .pacman-player {
+        width: 28px;
+        height: 28px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+
+      .pacman-ghost {
+        width: 25px;
+        height: 25px;
       }
 
       .pacman-node {
@@ -1580,7 +1674,7 @@
         transform: none !important;
         display: flex;
         align-items: center;
-        gap: 0.85rem;
+        gap: 0.95rem;
         width: 100%;
         padding-left: 0.25rem;
       }
@@ -1588,26 +1682,6 @@
       .pacman-node--right,
       .pacman-node--left {
         justify-content: flex-start;
-      }
-
-      .pacman-node {
-        opacity: 0;
-        transform: translateX(-16px);
-        animation: nodeSlideIn 0.5s var(--ease-out) forwards;
-      }
-
-      .pacman-node:nth-child(1) { animation-delay: 0.05s; }
-      .pacman-node:nth-child(2) { animation-delay: 0.12s; }
-      .pacman-node:nth-child(3) { animation-delay: 0.19s; }
-      .pacman-node:nth-child(4) { animation-delay: 0.26s; }
-      .pacman-node:nth-child(5) { animation-delay: 0.33s; }
-      .pacman-node:nth-child(6) { animation-delay: 0.40s; }
-      .pacman-node:nth-child(7) { animation-delay: 0.47s; }
-      .pacman-node:nth-child(8) { animation-delay: 0.54s; }
-      .pacman-node:nth-child(n+9) { animation-delay: 0.6s; }
-
-      @keyframes nodeSlideIn {
-        to { opacity: 1; transform: translateX(0); }
       }
 
       .pacman-node__link {
@@ -1631,9 +1705,56 @@
         align-items: flex-start;
       }
 
+      /* Yem yenince etiket hafifçe içeri kayıp vurgulanır */
+      .pacman-node .pacman-node__seat {
+        transition: color 0.3s var(--ease-out), transform 0.4s var(--ease-spring);
+      }
+
+      .pacman-node.is-eaten .pacman-node__seat {
+        transform: translateX(5px);
+        color: var(--pac);
+      }
+
+      .pacman-node.is-active .pacman-node__pellet {
+        transform: scale(1.35);
+        box-shadow: 0 0 0 5px rgba(61, 19, 34, 0.12);
+      }
+
       .pacman-node__name {
         border-bottom: none;
         padding-bottom: 0;
+      }
+
+      /* STAGE CLEAR — mobilde listenin altında kart olarak belirir */
+      .pacman-win {
+        display: none;
+        position: static;
+        inset: auto;
+        margin-top: 1.75rem;
+        padding: 2.25rem 1.25rem;
+        border: 1px solid var(--warm);
+        background: var(--bg-secondary);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transition: none;
+      }
+
+      .pacman-view.is-won .pacman-win {
+        display: flex;
+        animation: winCardIn 0.6s var(--ease-out) both;
+      }
+
+      .pacman-win__inner {
+        transform: none;
+        transition: none;
+      }
+
+      @keyframes winCardIn {
+        from { opacity: 0; transform: translateY(18px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
       }
     }
 
@@ -1700,4 +1821,163 @@
     @media (prefers-reduced-motion: reduce) {
       .wa-fab { animation: none; }
       .wa-fab:hover { transform: none; }
+    }
+
+    /* =========================================================
+       MOBİL ANİMASYONLAR — yalnızca küçük ekranlar
+       ========================================================= */
+    @media (max-width: 768px) {
+      /* Hero başlık: satır satır yatay silinme (wipe) efekti */
+      .hero__title span {
+        transform: none;
+        animation-name: titleWipe;
+        animation-duration: 1s;
+      }
+
+      @keyframes titleWipe {
+        from {
+          opacity: 0;
+          clip-path: inset(-10% 100% -30% 0);
+          transform: translateX(-8px);
+        }
+        to {
+          opacity: 1;
+          clip-path: inset(-10% -10% -30% 0);
+          transform: translateX(0);
+        }
+      }
+
+      /* Hero deco karakteri: JS scroll parallax uygular */
+      .hero__deco {
+        will-change: transform;
+      }
+
+      /* Performans: mobilde blur filtresi yok — sadece opacity+transform */
+      .reveal {
+        filter: none;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s var(--ease-out),
+          transform 0.7s var(--ease-out);
+      }
+
+      .reveal.is-visible {
+        filter: none;
+        transform: translateY(0);
+      }
+
+      .page-section.is-entering {
+        animation-name: sectionEnterMobile;
+      }
+
+      @keyframes sectionEnterMobile {
+        from { opacity: 0.4; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* İlerleme çizgisi görünür */
+      .nav__progress { display: block; }
+
+      /* WhatsApp FAB: dikkat nabzı + kaydırırken küçülme */
+      .wa-fab::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: waPulse 3s ease-out 1.2s infinite;
+      }
+
+      .wa-fab--mini {
+        transform: scale(0.68) translateY(8px);
+        opacity: 0.7;
+      }
+
+      .wa-fab--mini::after { animation: none; }
+
+      /* Felsefe: kelime kelime beliren alıntı */
+      .philosophy__text .ph-word {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(0.5em);
+      }
+
+      .philosophy.is-section-visible .ph-word {
+        animation: phWordUp 0.65s var(--ease-out) both;
+        animation-delay: calc(var(--wi, 0) * 0.045s);
+      }
+
+      @keyframes phWordUp {
+        from { opacity: 0; transform: translateY(0.5em); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+    }
+
+    @keyframes waPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45); }
+      65%  { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+    }
+
+    /* Dokunmatik cihazlar: hover yerine bası (tap) geri bildirimi */
+    @media (hover: none) and (pointer: coarse) {
+      a, button { -webkit-tap-highlight-color: transparent; }
+
+      .nav__cta:active,
+      .nav-mobile__cta:active,
+      .form-submit:active,
+      .pacman-win__cta:active {
+        transform: scale(0.95);
+        transition-duration: 0.15s;
+      }
+
+      .section-link:active {
+        color: var(--accent);
+        border-color: var(--accent);
+        transform: translateX(3px);
+        transition-duration: 0.15s;
+      }
+
+      .wa-fab:active { transform: scale(0.88); }
+
+      .service-cell:active {
+        background: var(--white);
+        transform: scale(0.985);
+        transition-duration: 0.2s;
+      }
+
+      .service-cell:active .service-cell__name { color: var(--accent); }
+
+      .pacman-node__seat:active { color: var(--pac); }
+      .pacman-node__seat:active .pacman-node__name { letter-spacing: 0.2em; }
+
+      .contact__item-value a:active,
+      .footer__social a:active,
+      .nav-mobile__link:active,
+      .contact-map__link:active { color: var(--accent); }
+
+      .post-card:active {
+        transform: scale(0.98);
+        transition-duration: 0.2s;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero__title span { clip-path: none; }
+      .nav__progress { display: none; }
+      .wa-fab::after { animation: none; }
+      .wa-fab--mini { transform: none; opacity: 1; }
+      .philosophy__text .ph-word {
+        animation: none !important;
+        opacity: 1;
+        transform: none;
+      }
+      .nav-mobile__link,
+      .nav-mobile__cta {
+        opacity: 1;
+        transform: none;
+        transition-delay: 0s !important;
+      }
+      .nav--hidden { transform: none; }
+      .pacman-node.is-eaten .pacman-node__seat { transform: none; }
     }
