@@ -11,7 +11,7 @@ const auth = require("../lib/auth");
 const firebase = require("../config/firebase");
 const projectsService = require("../services/projects");
 const blogService = require("../services/blog");
-const { uploadImage } = require("../services/storage");
+const { uploadImage, hasStorage } = require("../services/storage");
 const { slugify, formatDate } = require("../lib/util");
 
 const router = express.Router();
@@ -26,7 +26,7 @@ function adminView(res, view, opts = {}) {
     site: siteData,
     layout: false,
     firebaseReady: firebase.isConfigured,
-    storageReady: firebase.hasStorage,
+    storageReady: hasStorage(),
     formatDate,
     error: null,
     notice: null,
@@ -218,7 +218,7 @@ function handleFormError(res, view, err, extra) {
     site: siteData,
     layout: false,
     firebaseReady: firebase.isConfigured,
-    storageReady: firebase.hasStorage,
+    storageReady: hasStorage(),
     formatDate,
     error: err.message || "Bir hata oluştu.",
     notice: null,

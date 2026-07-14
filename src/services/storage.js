@@ -1,24 +1,23 @@
 /**
- * Firebase Storage'a resim yükleme.
+ * Cloudinary'e resim yükleme.
  *
- * multer ile bellekte tutulan dosya buffer'ını Storage'a yazar ve herkese
- * açık (public) bir URL döndürür.
+ * multer ile bellekte tutulan dosya buffer'ını Cloudinary'e yükler ve herkese
+ * açık (public), CDN üzerinden servis edilen bir URL döndürür.
  */
-const crypto = require("crypto");
 const path = require("path");
-const firebase = require("../config/firebase");
+const cloud = require("../config/cloudinary");
 
 const ALLOWED = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".svg"]);
 
 /**
  * @param {Express.Multer.File} file  multer bellek dosyası
  * @param {string} folder             "projects" | "blog"
- * @returns {Promise<string>}         public URL
+ * @returns {Promise<string>}         public (secure) URL
  */
 async function uploadImage(file, folder = "uploads") {
   if (!file) return "";
-  if (!firebase.hasStorage) {
-    throw new Error("Firebase Storage yapılandırılmadı (FIREBASE_STORAGE_BUCKET eksik).");
+  if (!cloud.isConfigured) {
+    throw new Error("Cloudinary yapılandırılmadı (CLOUDINARY_URL veya CLOUDINARY_* env değişkenleri eksik).");
   }
 
   const ext = path.extname(file.originalname).toLowerCase();
@@ -26,22 +25,30 @@ async function uploadImage(file, folder = "uploads") {
     throw new Error("Desteklenmeyen dosya türü. JPG, PNG, WEBP, GIF, AVIF veya SVG yükleyin.");
   }
 
-  const name = `${folder}/${Date.now()}-${crypto.randomBytes(6).toString("hex")}${ext}`;
-  const token = crypto.randomUUID();
-  const blob = firebase.bucket.file(name);
-
-  await blob.save(file.buffer, {
-    resumable: false,
-    contentType: file.mimetype,
-    metadata: {
-      cacheControl: "public, max-age=31536000",
-      metadata: { firebaseStorageDownloadTokens: token },
-    },
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloud.cloudinary.uploader.upload_stream(
+      {
+        folder: `meg/${folder}`,
+        resource_type: "image",
+        // Aynı isimden gelen çakışmaları önlemek için benzersiz public_id üret.
+        use_filename: false,
+        unique_filename: true,
+        overwrite: false,
+      },
+      (error, uploaded) => {
+        if (error) return reject(error);
+        resolve(uploaded);
+      }
+    );
+    stream.end(file.buffer);
   });
 
-  // Token tabanlı public URL (kovayı public yapmaya gerek kalmadan erişilir).
-  const encoded = encodeURIComponent(name);
-  return `https://firebasestorage.googleapis.com/v0/b/${firebase.bucket.name}/o/${encoded}?alt=media&token=${token}`;
+  return result.secure_url;
 }
 
-module.exports = { uploadImage };
+/** Yükleme özelliğinin aktif olup olmadığını bildirir (admin panel formları için). */
+function hasStorage() {
+  return cloud.isConfigured;
+}
+
+module.exports = { uploadImage, hasStorage };
