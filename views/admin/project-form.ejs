@@ -53,7 +53,7 @@
           <div style="flex:1;">
             <input type="file" id="image" name="image" accept="image/*" <%= storageReady ? '' : 'disabled' %> />
             <% if (!storageReady) { %>
-              <p class="field__hint">Storage tanımlı değil — aşağıya resim URL'si girin.</p>
+              <p class="field__hint">Cloudinary tanımlı değil — aşağıya resim URL'si girin.</p>
             <% } else if (project && project.image) { %>
               <p class="field__hint">Yeni dosya seçmezseniz mevcut görsel korunur.</p>
             <% } %>
