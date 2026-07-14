@@ -2,7 +2,7 @@ module.exports = {
   meta: {
     title: "MEG Mimarlık | Konya Mimarlık ve İç Mimarlık Ofisi",
     description:
-      "MEG Mimarlık — 2012'den beri Konya'da konut, villa ve ticari projeler tasarlayan mimarlık & iç mimarlık ofisi. Mimari tasarım, iç mekan, restorasyon ve 3B görselleştirme.",
+      "MEG Mimarlık — 2025'ten beri Konya'da konut, villa ve ticari projeler tasarlayan mimarlık & iç mimarlık ofisi. Mimari tasarım, iç mekan, restorasyon ve 3B görselleştirme.",
     // SEO için kök adres. Vercel'de SITE_URL env'i ile ezilebilir.
     siteUrl: process.env.SITE_URL || "https://www.megproje.net",
     locale: "tr_TR",
@@ -13,7 +13,7 @@ module.exports = {
     organization: {
       name: "MEG Mimarlık",
       legalName: "MEG Mimarlık",
-      foundingDate: "2012",
+      foundingDate: "2025",
       priceRange: "₺₺",
       // Yaklaşık konum (Sakarya Mah, Selçuklu/Konya). Google Business Profile'daki
       // gerçek pinle güncellenmeli.
@@ -34,7 +34,6 @@ module.exports = {
     { label: "Projeler", href: "/#projects" },
     { label: "Hizmetler", href: "/#services" },
     { label: "Hakkımızda", href: "/#about" },
-    { label: "Blog", href: "/blog" },
     { label: "İletişim", href: "/#contact" },
   ],
 
@@ -119,7 +118,7 @@ module.exports = {
     statement:
       'Mimarlık, yalnızca <em>yapı</em> üretmek değil; yaşamın <em>ritmini</em> mekâna taşımaktır.',
     paragraphs: [
-      "MEG Mimarlık, 2012'den bu yana Konya ve çevresinde konut, ticari ve kamusal projeler tasarlayan bağımsız bir stüdyodur. Her projede bağlam, iklim ve kullanıcı deneyimini birlikte ele alırız.",
+      "MEG Mimarlık, 2025'ten bu yana Konya ve çevresinde konut, ticari ve kamusal projeler tasarlayan bağımsız bir stüdyodur. Her projede bağlam, iklim ve kullanıcı deneyimini birlikte ele alırız.",
       "Sürdürülebilir malzeme seçimi, yerel ustalık ve çağdaş tasarım dilini harmanlayarak; uzun ömürlü, bakımı kolay ve estetik açıdan zamansız mekânlar yaratmayı hedefliyoruz.",
     ],
   },
