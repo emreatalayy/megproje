@@ -6,13 +6,132 @@
   var PACMAN_LAYOUT_BREAKPOINT = 901;
 
   var nav = document.getElementById("nav");
-  var navProgress = document.getElementById("navProgress");
   var heroDeco = document.querySelector(".hero__deco");
+  var heroContent = document.querySelector(".hero__content");
+  var heroSection = document.querySelector(".hero");
+  var scrollProgress = document.getElementById("scrollProgress");
   var waFab = document.querySelector(".wa-fab");
   var motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function isMobileViewport() {
     return window.innerWidth < MOBILE_BREAKPOINT;
+  }
+
+  /* Lenis yumuşak kaydırma — reduced-motion'da devre dışı, native scroll kalır.
+     Lenis gerçek pencere scrollTop'u günceller; mevcut scroll dinleyicileri
+     ve IntersectionObserver'lar değişmeden çalışmaya devam eder. */
+  var lenis = null;
+
+  if (window.Lenis && !motionQuery.matches) {
+    lenis = new window.Lenis({
+      duration: 1.15,
+      easing: function (t) {
+        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+      },
+      anchors: { offset: -80 },
+    });
+
+    var lenisRaf = function (time) {
+      lenis.raf(time);
+      requestAnimationFrame(lenisRaf);
+    };
+    requestAnimationFrame(lenisRaf);
+  }
+
+  /* Sabit üst ilerleme çizgisi + hero parallax (tüm ekranlar).
+     Lenis scroll'u yumuşattığı için doğrudan scaleX eşlemesi de akıcı görünür. */
+  var scrollEffectsTicking = false;
+
+  function renderScrollEffects() {
+    scrollEffectsTicking = false;
+    var y = window.scrollY;
+
+    if (scrollProgress) {
+      var docRange =
+        document.documentElement.scrollHeight - window.innerHeight;
+      var p = docRange > 0 ? Math.min(1, Math.max(0, y / docRange)) : 0;
+      scrollProgress.style.transform = "scaleX(" + p + ")";
+    }
+
+    if (heroContent && heroSection && !motionQuery.matches) {
+      var vh = window.innerHeight;
+      if (y < vh) {
+        heroContent.style.transform =
+          "translate3d(0," + y * 0.25 + "px,0)";
+        heroContent.style.opacity = String(
+          Math.max(0, 1 - y / (vh * 0.85))
+        );
+      } else if (heroContent.style.transform) {
+        heroContent.style.transform = "";
+        heroContent.style.opacity = "";
+      }
+    }
+  }
+
+  function requestScrollEffects() {
+    if (scrollEffectsTicking) return;
+    scrollEffectsTicking = true;
+    requestAnimationFrame(renderScrollEffects);
+  }
+
+  window.addEventListener("scroll", requestScrollEffects, { passive: true });
+  window.addEventListener("resize", requestScrollEffects);
+  renderScrollEffects();
+
+  /* Sayfa geçişleri.
+     Chrome/Edge/Safari: CSS @view-transition ile cross-document geçiş
+     tarayıcı tarafından otomatik yapılır (pageswap/pagereveal olayları var).
+     Desteklemeyen tarayıcılar (Firefox) için: aynı origin'e normal sol tıkla
+     gidilen gerçek gezinmelerde içeriği söndürüp sonra yönlendiririz. */
+  var supportsCrossDocVT = "onpageswap" in window;
+
+  if (!supportsCrossDocVT && !motionQuery.matches) {
+    document.addEventListener("click", function (e) {
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      var link = e.target.closest ? e.target.closest("a") : null;
+      if (!link) return;
+
+      var href = link.getAttribute("href");
+      if (!href) return;
+      if (link.target && link.target !== "_self") return;
+      if (link.hasAttribute("download")) return;
+      if (/^(mailto:|tel:|#)/i.test(href)) return;
+
+      var url;
+      try {
+        url = new URL(link.href, window.location.href);
+      } catch (err) {
+        return;
+      }
+
+      if (url.origin !== window.location.origin) return; // dış link
+      // aynı sayfa içindeki anchor — normal smooth-scroll devralsın
+      if (url.pathname === window.location.pathname && url.hash) return;
+      if (url.href === window.location.href) return;
+
+      e.preventDefault();
+      document.body.classList.add("is-leaving");
+      window.setTimeout(function () {
+        window.location.href = link.href;
+      }, 320);
+    });
+  }
+
+  /* bfcache/geri tuşu: geri gelindiğinde çıkış durumu temizlensin */
+  window.addEventListener("pageshow", function () {
+    document.body.classList.remove("is-leaving");
+  });
+
+  /* Açılış ekranı: perde yukarı kalktıktan sonra DOM'dan kaldır */
+  var preloader = document.getElementById("preloader");
+  if (preloader) {
+    preloader.addEventListener("animationend", function (e) {
+      if (e.animationName === "preLift") {
+        preloader.style.display = "none";
+      }
+    });
   }
 
   /* Mobil scroll davranışları: nav gizle/göster, okuma çizgisi,
@@ -46,12 +165,6 @@
       } else if (goingUp || y <= 160) {
         nav.classList.remove("nav--hidden");
         if (waFab) waFab.classList.remove("wa-fab--mini");
-      }
-
-      if (navProgress) {
-        var docRange = document.documentElement.scrollHeight - window.innerHeight;
-        navProgress.style.transform =
-          "scaleX(" + (docRange > 0 ? Math.min(1, y / docRange) : 0) + ")";
       }
 
       if (heroDeco && !motionQuery.matches) {
@@ -225,8 +338,14 @@
       e.preventDefault();
       document.body.classList.add("is-section-transition");
 
+      var navOffset = -((nav ? nav.offsetHeight : 72) + 8);
+
       window.setTimeout(function () {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (lenis) {
+          lenis.scrollTo(target, { offset: navOffset });
+        } else {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
         playSectionEnter(target);
 
         var sectionId = target.id;
@@ -266,10 +385,8 @@
     var revealObserver = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            revealObserver.unobserve(entry.target);
-          }
+          /* once:false — eleman ekrandan çıkınca sıfırlanır, geri gelince tekrar oynar */
+          entry.target.classList.toggle("is-visible", entry.isIntersecting);
         });
       },
       { root: null, rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
