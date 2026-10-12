@@ -225,9 +225,13 @@
   var ringX = 0;
   var ringY = 0;
   var cursorEnabled = false;
+  var finePointerQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
 
   function enableCursor() {
-    cursorEnabled = window.innerWidth >= MOBILE_BREAKPOINT;
+    /* Dokunmatik tabletlerde (geniş ama faresiz) imleç noktası köşede asılı kalmasın */
+    cursorEnabled =
+      window.innerWidth >= MOBILE_BREAKPOINT && finePointerQuery.matches && !!dot && !!ring;
+    document.body.classList.toggle("has-cursor", cursorEnabled);
     if (!dot || !ring) return;
     if (!cursorEnabled) {
       dot.style.display = "none";
@@ -398,6 +402,117 @@
     revealEls.forEach(function (el) {
       el.classList.add("is-visible");
     });
+  }
+
+  /* Çizim animasyonları (motif bantları, vaziyet planı, disiplin kartları):
+     ekrana ilk girişte bir kez oynar */
+  var drawEls = document.querySelectorAll("[data-draw]");
+
+  function markDrawn(el) {
+    el.classList.add("is-drawn");
+    /* Kartların sıralı giriş gecikmesi bitince hover tepkisi gecikmesiz olsun */
+    if (el.hasAttribute("data-wheel")) {
+      window.setTimeout(function () {
+        el.classList.add("is-settled");
+      }, 1300);
+    }
+  }
+
+  if ("IntersectionObserver" in window && !motionQuery.matches) {
+    var drawObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          markDrawn(entry.target);
+          drawObserver.unobserve(entry.target);
+        });
+      },
+      { root: null, rootMargin: "0px 0px -12% 0px", threshold: 0.15 }
+    );
+    drawEls.forEach(function (el) {
+      drawObserver.observe(el);
+    });
+  } else {
+    drawEls.forEach(markDrawn);
+  }
+
+  /* Disiplinler — mobilde alt alta kartlar, kaydırdıkça çark gibi döner.
+     Ekran ortasındaki kart düz ve önde durur (.is-active); üst ve alttakiler
+     bir silindirin yüzeyindeymiş gibi geriye yatar, küçülür ve soluklaşır. */
+  var wheel = document.querySelector("[data-wheel]");
+
+  if (wheel) {
+    var wheelCards = wheel.querySelectorAll(".service-card");
+    var WHEEL_MAX_ANGLE = 40; /* derece — ortadan en uzak kartın eğimi */
+    var WHEEL_MAX_DEPTH = 110; /* px — en uzak kartın geriye itilmesi */
+    var WHEEL_PULL = 45; /* px — uzak kartlar ortaya çekilir; silindirdeki sıkışma hissi */
+    var wheelTicking = false;
+    var wheelOn = false;
+
+    var resetWheel = function () {
+      wheelCards.forEach(function (card) {
+        card.style.transform = "";
+        card.style.opacity = "";
+        card.classList.remove("is-active");
+      });
+    };
+
+    var renderWheel = function () {
+      wheelTicking = false;
+
+      if (!isMobileViewport() || motionQuery.matches) {
+        if (wheelOn) {
+          resetWheel();
+          wheelOn = false;
+        }
+        return;
+      }
+
+      var vh = window.innerHeight;
+      var gridRect = wheel.getBoundingClientRect();
+      /* Ekrandan uzaktayken hesaplama yapma */
+      if (gridRect.bottom < -vh * 0.5 || gridRect.top > vh * 1.5) return;
+      wheelOn = true;
+
+      var mid = vh / 2;
+      var span = vh * 0.55;
+      var best = null;
+      var bestDist = Infinity;
+
+      wheelCards.forEach(function (card) {
+        /* Konum transform'dan etkilenmesin diye offsetTop ile ölçülür */
+        var center = gridRect.top + card.offsetTop + card.offsetHeight / 2;
+        var dist = center - mid;
+        var d = Math.max(-1, Math.min(1, dist / span));
+        var a = Math.abs(d);
+
+        card.style.transform =
+          "perspective(900px) " +
+          "translateY(" + (-d * a * WHEEL_PULL).toFixed(1) + "px) " +
+          "translateZ(" + (-a * WHEEL_MAX_DEPTH).toFixed(1) + "px) " +
+          "rotateX(" + (-d * WHEEL_MAX_ANGLE).toFixed(2) + "deg)";
+        card.style.opacity = String(1 - a * 0.55);
+
+        if (Math.abs(dist) < bestDist) {
+          bestDist = Math.abs(dist);
+          best = card;
+        }
+      });
+
+      wheelCards.forEach(function (card) {
+        card.classList.toggle("is-active", card === best);
+      });
+    };
+
+    var requestWheel = function () {
+      if (wheelTicking) return;
+      wheelTicking = true;
+      requestAnimationFrame(renderWheel);
+    };
+
+    window.addEventListener("scroll", requestWheel, { passive: true });
+    window.addEventListener("resize", requestWheel);
+    renderWheel();
   }
 
   /* Felsefe alıntısı — mobilde kelime kelime reveal için span'lere böl */
@@ -710,32 +825,72 @@
   var formStatus = document.getElementById("formStatus");
 
   if (contactForm) {
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function showStatus(text, isError) {
+      if (!formStatus) return;
+      formStatus.hidden = false;
+      formStatus.textContent = text;
+      formStatus.classList.toggle("form-status--error", !!isError);
+    }
+
+    /* Kullanıcı düzeltmeye başlayınca hata işareti kalksın */
+    contactForm.addEventListener("input", function (e) {
+      if (e.target && e.target.getAttribute("aria-invalid") === "true") {
+        e.target.removeAttribute("aria-invalid");
+      }
+    });
+
     contactForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      var name = document.getElementById("name").value.trim();
-      var email = document.getElementById("email").value.trim();
-      var message = document.getElementById("message").value.trim();
+      var nameEl = document.getElementById("name");
+      var emailEl = document.getElementById("email");
+      var messageEl = document.getElementById("message");
+      var phoneEl = document.getElementById("phone");
+      var typeEl = contactForm.querySelector('input[name="projectType"]:checked');
+      var name = nameEl.value.trim();
+      var email = emailEl.value.trim();
+      var message = messageEl.value.trim();
+      var phone = phoneEl ? phoneEl.value.trim() : "";
+      var projectType = typeEl ? typeEl.value : "";
       var submitBtn = contactForm.querySelector(".form-submit");
 
-      if (!name || !email || !message) return;
-
-      function showStatus(text, isError) {
-        if (!formStatus) return;
-        formStatus.hidden = false;
-        formStatus.textContent = text;
-        formStatus.classList.toggle("form-status--error", !!isError);
+      /* Boş/geçersiz alanlar: sessizce durmak yerine kullanıcıya söyle */
+      var invalid = [];
+      if (!name) invalid.push(nameEl);
+      if (!email || !EMAIL_RE.test(email)) invalid.push(emailEl);
+      if (!message) invalid.push(messageEl);
+      [nameEl, emailEl, messageEl].forEach(function (el) {
+        if (invalid.indexOf(el) === -1) el.removeAttribute("aria-invalid");
+        else el.setAttribute("aria-invalid", "true");
+      });
+      if (invalid.length) {
+        var emailOnly = invalid.length === 1 && invalid[0] === emailEl && email;
+        showStatus(
+          emailOnly
+            ? "Lütfen geçerli bir e-posta adresi girin."
+            : "Lütfen ad soyad, e-posta ve proje hakkında alanlarını doldurun.",
+          true
+        );
+        invalid[0].focus();
+        return;
       }
 
       function mailtoFallback() {
         var mail =
-          (window.MEG_SITE && window.MEG_SITE.contactEmail) || "info@megmimarlik.net";
+          (window.MEG_SITE && window.MEG_SITE.contactEmail) || "info@megproje.net";
+        var body =
+          message +
+          "\n\n- " + name + "\n" + email +
+          (phone ? "\n" + phone : "") +
+          (projectType ? "\nProje türü: " + projectType : "");
         window.location.href =
           "mailto:" +
           mail +
           "?subject=" +
           encodeURIComponent("Proje Talebi - " + name) +
           "&body=" +
-          encodeURIComponent(message + "\n\n- " + name + "\n" + email);
+          encodeURIComponent(body);
       }
 
       if (submitBtn) submitBtn.disabled = true;
@@ -743,16 +898,32 @@
       fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name, email: email, message: message }),
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          phone: phone,
+          projectType: projectType,
+          message: message,
+        }),
       })
         .then(function (res) {
           return res.json().then(function (data) {
-            if (!res.ok) throw new Error(data.error || "Gönderilemedi");
-            showStatus(data.message || "Mesajınız alındı.", false);
-            contactForm.reset();
+            if (res.ok) {
+              showStatus(data.message || "Mesajınız alındı.", false);
+              contactForm.reset();
+              return;
+            }
+            /* 4xx: kullanıcı düzeltebilir — mesajı göster, e-posta istemcisine atma */
+            if (res.status >= 400 && res.status < 500) {
+              showStatus(data.error || "Lütfen bilgileri kontrol edin.", true);
+              return;
+            }
+            throw new Error(data.error || "Gönderilemedi");
           });
         })
         .catch(function () {
+          /* Sunucu/ağ hatası: e-posta istemcisiyle göndermeyi öner */
+          showStatus("Mesaj şu an gönderilemedi; e-posta uygulamanız açılıyor.", true);
           mailtoFallback();
         })
         .finally(function () {

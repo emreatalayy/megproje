@@ -133,6 +133,8 @@
       </div>
     </section>
 
+    <%- include('partials/motif', { tone: 'light' }) %>
+
     <section class="section about page-section reveal" id="about" aria-labelledby="about-heading" data-section="about">
       <div class="about-grid">
         <blockquote class="about__statement reveal reveal-delay-1"><%- site.about.statement %></blockquote>
@@ -152,73 +154,135 @@
         </div>
         <p class="reveal reveal-delay-2"><%= site.services.intro %></p>
       </div>
-      <div class="services-grid">
+      <div class="services-grid" data-draw data-wheel role="list" aria-label="<%= site.services.title %>">
         <% site.services.items.forEach(function (svc, i) { %>
-          <article class="service-cell reveal reveal-delay-<%= (i % 3) + 1 %>">
-            <p class="service-cell__no"><%= svc.no %></p>
-            <h3 class="service-cell__name"><%= svc.name %></h3>
-            <p class="service-cell__desc"><%= svc.desc %></p>
+          <article class="service-card" role="listitem" style="--i: <%= i %>">
+            <span class="service-card__badge" aria-hidden="true">
+              <svg viewBox="0 0 36 36" focusable="false">
+                <rect x="6" y="6" width="24" height="24" />
+                <rect x="6" y="6" width="24" height="24" transform="rotate(45 18 18)" />
+              </svg>
+              <span><%= svc.no %></span>
+            </span>
+            <h3 class="service-card__name"><%= svc.name %></h3>
+            <p class="service-card__desc"><%= svc.desc %></p>
           </article>
         <% }); %>
       </div>
     </section>
 
-    <section class="philosophy page-section reveal" aria-label="Felsefe" data-section="philosophy">
+    <%- include('partials/motif', { tone: 'dark' }) %>
+
+    <%# Koyu blok motif bantlarına bitişik: bölümün kendisi reveal ile kaymamalı
+        (kayınca bantla arasında krem şerit açılıyor); yalnızca içindeki yazı belirir. %>
+    <section class="philosophy page-section" aria-label="Felsefe" data-section="philosophy">
       <span class="philosophy__quote-mark" aria-hidden="true">"</span>
       <blockquote class="philosophy__text reveal reveal-delay-1"><%= site.philosophy.quote %></blockquote>
       <p class="philosophy__attr reveal reveal-delay-2"><%= site.philosophy.attribution %></p>
     </section>
 
+    <%- include('partials/motif', { tone: 'dark' }) %>
+
     <section class="section contact page-section reveal" id="contact" aria-labelledby="contact-heading" data-section="contact">
+      <div class="contact-head reveal reveal-delay-1">
+        <p class="section-label">İletişim</p>
+        <h2 class="contact__title" id="contact-heading"><%= site.contact.title %></h2>
+      </div>
+
       <div class="contact-grid">
-        <div>
-          <h2 class="contact__title reveal reveal-delay-1" id="contact-heading"><%= site.contact.title %></h2>
-          <div class="contact__item reveal reveal-delay-2">
-            <p class="contact__item-label">Adres</p>
-            <p class="contact__item-value"><%= site.contact.address.line1 %><br /><%= site.contact.address.line2 %></p>
-          </div>
-          <div class="contact__item reveal reveal-delay-3">
-            <p class="contact__item-label">E-posta</p>
-            <p class="contact__item-value"><a href="mailto:<%= site.contact.email %>" class="interactive"><%= site.contact.email %></a></p>
-          </div>
-          <div class="contact__item reveal reveal-delay-4">
-            <p class="contact__item-label">Telefon</p>
-            <p class="contact__item-value"><a href="tel:<%= site.contact.phoneHref %>" class="interactive"><%= site.contact.phone %></a></p>
-          </div>
+        <div class="contact-info">
+          <dl class="contact-sheet reveal reveal-delay-1">
+            <div class="contact-sheet__row">
+              <dt>Adres</dt>
+              <dd><%= site.contact.address.line1 %>, <%= site.contact.address.line2 %></dd>
+            </div>
+            <div class="contact-sheet__row">
+              <dt>E-posta</dt>
+              <dd><a href="mailto:<%= site.contact.email %>" class="interactive"><%= site.contact.email %></a></dd>
+            </div>
+            <div class="contact-sheet__row">
+              <dt>Telefon</dt>
+              <dd><a href="tel:<%= site.contact.phoneHref %>" class="interactive"><%= site.contact.phone %></a></dd>
+            </div>
+            <div class="contact-sheet__row">
+              <dt>Saatler</dt>
+              <dd><%= site.contact.hours %></dd>
+            </div>
+          </dl>
+
+          <figure class="contact-plan reveal reveal-delay-2" data-draw>
+            <svg viewBox="0 0 600 300" role="img" aria-label="Ofis konumunu gösteren şematik vaziyet planı: <%= site.contact.address.full %>">
+              <g class="plan-lots">
+                <path class="plan-lot" style="--d: 0s" d="M30 30H180V120H30Z" />
+                <path class="plan-lot" style="--d: .08s" d="M290 20H420V80H290Z" />
+                <path class="plan-lot" style="--d: .16s" d="M450 15H580V95H450Z" />
+                <path class="plan-lot" style="--d: .32s" d="M20 225H190V280H20Z" />
+                <path class="plan-lot" style="--d: .4s" d="M300 200H450V270H300Z" />
+                <path class="plan-lot" style="--d: .48s" d="M480 185H580V270H480Z" />
+              </g>
+              <g class="plan-roads">
+                <path class="plan-road" pathLength="1" d="M0 170L600 120" />
+                <path class="plan-road" pathLength="1" d="M0 204L600 154" />
+                <path class="plan-road" pathLength="1" d="M215 0L255 300" />
+                <path class="plan-road" pathLength="1" d="M247 0L287 300" />
+              </g>
+              <text class="plan-label" x="56" y="190" transform="rotate(-4.76 56 190)">ULUYAYLA CD.</text>
+              <g class="plan-pin">
+                <path class="plan-office" d="M306 140L346 136.7V100H306Z" />
+                <circle class="plan-ring" cx="326" cy="120" r="30" />
+                <text class="plan-label plan-label--pin" x="364" y="118">MEG · No:52 A</text>
+              </g>
+              <g class="plan-north">
+                <path d="M560 266V234M560 234L552 250M560 234L568 250" />
+                <text class="plan-label" x="555" y="226">K</text>
+              </g>
+            </svg>
+            <figcaption>
+              <span>Vaziyet · Selçuklu</span>
+              <span class="contact-plan__links">
+                <a href="<%= site.contact.map.openUrl %>" class="interactive" target="_blank" rel="noopener noreferrer">Haritada aç</a>
+                <a href="<%= site.contact.map.directionsUrl %>" class="interactive" target="_blank" rel="noopener noreferrer">Yol tarifi al ↗</a>
+              </span>
+            </figcaption>
+          </figure>
         </div>
+
         <form class="contact__form reveal reveal-delay-2" id="contactForm" novalidate>
           <div class="form-group">
             <label class="form-label" for="name">Ad Soyad</label>
             <input class="form-input interactive" type="text" id="name" name="name" autocomplete="name" required />
           </div>
-          <div class="form-group">
-            <label class="form-label" for="email">E-posta</label>
-            <input class="form-input interactive" type="email" id="email" name="email" autocomplete="email" required />
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="email">E-posta</label>
+              <input class="form-input interactive" type="email" id="email" name="email" autocomplete="email" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="phone">Telefon (isteğe bağlı)</label>
+              <input class="form-input interactive" type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" />
+            </div>
           </div>
+          <fieldset class="form-group form-choice">
+            <legend class="form-label">Proje türü</legend>
+            <div class="form-segment">
+              <% site.contact.projectTypes.forEach(function (type, i) { %>
+                <label class="form-segment__opt interactive">
+                  <input type="radio" name="projectType" value="<%= type %>"<%= i === 0 ? ' checked' : '' %> />
+                  <span><%= type %></span>
+                </label>
+              <% }); %>
+            </div>
+          </fieldset>
           <div class="form-group">
-            <label class="form-label" for="message">Mesaj</label>
-            <textarea class="form-textarea interactive" id="message" name="message" rows="3" required></textarea>
+            <label class="form-label" for="message">Proje hakkında</label>
+            <textarea class="form-textarea interactive" id="message" name="message" rows="4" required></textarea>
           </div>
           <p class="form-status" id="formStatus" role="status" aria-live="polite" hidden></p>
-          <button type="submit" class="form-submit interactive">Gönder</button>
+          <button type="submit" class="form-submit interactive">
+            <span>Gönder</span>
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2 8H13M9 4L13 8L9 12" /></svg>
+          </button>
         </form>
-      </div>
-
-      <div class="contact-map reveal reveal-delay-2">
-        <div class="contact-map__header">
-          <p class="contact__item-label"><%= site.contact.map.label %></p>
-          <a href="<%= site.contact.map.directionsUrl %>" class="section-link interactive" target="_blank" rel="noopener noreferrer">Yol tarifi al →</a>
-        </div>
-        <div class="contact-map__frame">
-          <iframe
-            src="<%= site.contact.map.embedUrl %>"
-            title="MEG Mimarlık ofis konumu — <%= site.contact.address.full %>"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <a href="<%= site.contact.map.openUrl %>" class="contact-map__link interactive" target="_blank" rel="noopener noreferrer">Google Maps'te aç</a>
       </div>
     </section>
   </main>
@@ -229,6 +293,6 @@
     window.MEG_SITE = { contactEmail: "<%= site.contact.email %>" };
   </script>
   <script src="/vendor/lenis.min.js?v=1"></script>
-  <script src="/js/main.js?v=16"></script>
+  <script src="/js/main.js?v=18"></script>
 </body>
 </html>

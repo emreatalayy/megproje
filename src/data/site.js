@@ -30,10 +30,12 @@ module.exports = {
     },
   },
 
+  // Sıra, ana sayfadaki bölüm sırasıyla aynı olmalı (kaydırırken aktif link
+  // soldan sağa ilerlesin): Projeler → Hakkımızda → Hizmetler → İletişim.
   nav: [
     { label: "Projeler", href: "/#projects" },
-    { label: "Hizmetler", href: "/#services" },
     { label: "Hakkımızda", href: "/#about" },
+    { label: "Hizmetler", href: "/#services" },
     { label: "İletişim", href: "/#contact" },
   ],
 
@@ -178,6 +180,10 @@ module.exports = {
       line2: "42100 Selçuklu / Konya",
       full: "Sakarya, Uluyayla Cd. NO:52 A, 42100 Selçuklu/Konya",
     },
+    // head.ejs'teki JSON-LD çalışma saatleriyle aynı tutulmalı.
+    hours: "Pzt–Cum 09:00–18:00 · Cmt 10:00–16:00",
+    // İletişim formundaki "Proje türü" seçenekleri (ilki varsayılan seçili).
+    projectTypes: ["Konut", "Ticari", "İç mekân", "Restorasyon"],
     map: {
       label: "Konum",
       embedUrl:
@@ -192,9 +198,7 @@ module.exports = {
   footer: {
     year: new Date().getFullYear(),
     social: [
-      { label: "Instagram", href: "https://instagram.com" },
-      { label: "LinkedIn", href: "https://linkedin.com" },
-      { label: "Behance", href: "https://behance.net" },
+      { label: "Instagram", href: "https://www.instagram.com/meg.proje/" },
     ],
   },
 };

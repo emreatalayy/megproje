@@ -56,7 +56,7 @@ function escapeHtml(s) {
 
 /**
  * İletişim formundan gelen mesajı e-posta olarak gönderir.
- * @param {{name:string,email:string,message:string}} data
+ * @param {{name:string,email:string,message:string,phone?:string,projectType?:string}} data
  */
 async function sendContact(data) {
   const to = process.env.CONTACT_TO || process.env.SMTP_USER;
@@ -72,13 +72,17 @@ async function sendContact(data) {
   const subject = `Yeni iletişim mesajı — ${data.name}`;
   const text =
     `Ad Soyad: ${data.name}\n` +
-    `E-posta: ${data.email}\n\n` +
-    `Mesaj:\n${data.message}\n`;
+    `E-posta: ${data.email}\n` +
+    (data.phone ? `Telefon: ${data.phone}\n` : "") +
+    (data.projectType ? `Proje türü: ${data.projectType}\n` : "") +
+    `\nMesaj:\n${data.message}\n`;
   const html =
     `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1a1714;">` +
     `<h2 style="margin:0 0 12px;">Yeni iletişim mesajı</h2>` +
     `<p><strong>Ad Soyad:</strong> ${escapeHtml(data.name)}</p>` +
     `<p><strong>E-posta:</strong> <a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></p>` +
+    (data.phone ? `<p><strong>Telefon:</strong> ${escapeHtml(data.phone)}</p>` : "") +
+    (data.projectType ? `<p><strong>Proje türü:</strong> ${escapeHtml(data.projectType)}</p>` : "") +
     `<p><strong>Mesaj:</strong></p>` +
     `<p style="white-space:pre-line;border-left:3px solid #b5512a;padding-left:12px;">${escapeHtml(data.message)}</p>` +
     `<hr style="border:none;border-top:1px solid #eee;margin:16px 0;" />` +

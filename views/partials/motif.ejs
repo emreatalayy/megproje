@@ -1,0 +1,11 @@
+<%# Selçuklu yıldızı (sekiz köşe) motif bandı — bölümler arası ayraç.
+    Kullanım: include('partials/motif', { tone: 'light' | 'dark' }) %>
+<div class="motif-band motif-band--<%= locals.tone === 'dark' ? 'dark' : 'light' %>" data-draw aria-hidden="true">
+  <span class="motif-band__core">
+    <svg viewBox="0 0 36 36" focusable="false">
+      <rect x="6" y="6" width="24" height="24" />
+      <rect x="6" y="6" width="24" height="24" transform="rotate(45 18 18)" />
+      <circle cx="18" cy="18" r="3" />
+    </svg>
+  </span>
+</div>

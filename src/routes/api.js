@@ -17,7 +17,7 @@ router.get("/projects", async (req, res, next) => {
 });
 
 router.post("/contact", async (req, res) => {
-  const { name, email, message } = req.body || {};
+  const { name, email, message, phone, projectType } = req.body || {};
 
   if (!name?.trim() || !email?.trim() || !message?.trim()) {
     return res.status(400).json({
@@ -32,9 +32,15 @@ router.post("/contact", async (req, res) => {
   }
 
   try {
+    // Opsiyonel alanlar: tür/uzunluk sınırı, boşsa gönderilmez.
+    const optional = (v, max) =>
+      typeof v === "string" && v.trim() ? v.trim().slice(0, max) : "";
+
     await mailer.sendContact({
       name: name.trim(),
       email: email.trim(),
+      phone: optional(phone, 40),
+      projectType: optional(projectType, 60),
       message: message.trim(),
     });
     res.json({
